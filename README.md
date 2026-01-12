@@ -14,6 +14,10 @@ This repo contains an NPM package for SPA apps, and Splunk RUM examples for both
 - Configure Splunk RUM settings (realm, access token, app name, environment) in the script/package.
 - Deploy with your normal release pipeline so the bootstrapper is versioned and cacheable.
 
+## Common URL controls (MPA + SPA)
+
+Both the MPA script and the SPA package support the same URL parameters for enabling replay and toggling Session Recorder features. See the Recorder parameters section for the full list and an example URL.
+
 ## Recommendations
 
 - Load the bootstrapper early so it can capture the full session once recording is enabled.
@@ -64,7 +68,7 @@ The recorder accepts these optional params:
 - `sensitivityRules` (array of rule objects)
 - `features` (object) with keys like `backgroundServiceSrc`, `canvas`, `video`, `iframes`, `packAssets`, `cacheAssets`
 
-URL-driven overrides in the MPA script (query params):
+URL-driven overrides in both scripts (query params):
 
 - `replay=on|true` enables the recorder for the session.
 - `canvas=true|false`, `video=true|false`, `iframes=true|false`, `cacheAssets=true|false`
