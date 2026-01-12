@@ -27,8 +27,8 @@ declare global {
 // CONSTANTS (defaults only; apps should override via configOverride)
 // ----------------------------------------------------
 export const DEFAULT_RUM_CONFIG: RumConfig = {
-  realm: "us1",
-  rumAccessToken: "hdgooPQB-m5KlswkOls5Mg",
+  realm: "your_realm",
+  rumAccessToken: "your_access_token",
   applicationName: "shopping-spa-demo",
   environment: "development",
   debug: true,
