@@ -1,0 +1,33 @@
+name: Lint (TypeScript)
+
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install spa-npm deps
+        working-directory: spa-npm
+        run: npm install
+
+      - name: Install spa-demo deps
+        working-directory: spa-demo
+        run: npm install
+
+      - name: Run lint
+        run: npm run lint

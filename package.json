@@ -1,6 +1,11 @@
 {
   "name": "splunkrum-examples-workspace",
   "private": true,
+  "scripts": {
+    "lint": "npm run lint:spa-npm && npm run lint:spa-demo",
+    "lint:spa-npm": "npm --prefix spa-npm run build",
+    "lint:spa-demo": "npm --prefix spa-demo run lint"
+  },
   "devDependencies": {
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running lint checks..."
+npm --prefix spa-npm install
+npm --prefix spa-demo install
+npm run lint
