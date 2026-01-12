@@ -1,8 +1,8 @@
 import type { RumConfig } from "rumbootstrap";
 
 export const rumConfig: RumConfig = {
-  realm: "us1",
-  rumAccessToken: "hdgooPQB-m5KlswkOls5Mg",
+  realm: "your-realm",
+  rumAccessToken: "your-access-token",
   applicationName: "shopping-spa-demo",
   environment: "development",
   debug: true,
