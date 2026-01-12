@@ -19,7 +19,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          cache: "npm"
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package.json', 'spa-npm/package.json', 'spa-demo/package.json') }}
 
       - name: Install spa-npm deps
         working-directory: spa-npm
