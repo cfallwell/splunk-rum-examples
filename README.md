@@ -1,6 +1,58 @@
 # splunk-rum-examples
 
-This repo contains an NPM package for SPA apps, and Splunk RUM examples for both multi-page apps (MPA) and single-page apps (SPA) that enable on-demand session recording and control via url parameters. 
+This repo contains an NPM package for SPA apps, and Splunk RUM examples for both multi-page apps (MPA) and single-page apps (SPA) that enable on-demand session recording and control via url parameters.
+
+## Goals
+
+- Provide a single shared JS entry point for RUM + Session Recorder.
+- Enable Session Recorder on demand per session and expose Session Recorder parameters as top-level config so teams can tune masking, rules, and features using url parameters
+  - `?Replay=on` or `?Replay=true` enables recorder and persists for the current browser session.
+- Avoid requiring application teams for deployment changes.
+- Work for both SPAs and MPAs (React-specific hooks are optional).
+
+## Recorder parameters
+
+URL-parameter editable (MPA + SPA):
+
+- `replay=on|true` enables the recorder for the session.
+- `canvas=true|false`, `video=true|false`, `iframes=true|false`, `cacheAssets=true|false`
+- `assets=true|false` to toggle all `packAssets` entries.
+- `assetsStyles=true|false`, `assetsFonts=true|false`, `assetsImages=true|false` for per-asset control.
+- `backgroundServiceSrc=<url>` to set the background service worker URL.  For more information on the bacground Service Worker, See: https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md#background-service-configuration
+
+Not editable via URL (set in config for security):
+
+- `maskAllInputs` (boolean, default `true`)
+- `maskAllText` (boolean, default `true`)
+- `maxExportIntervalMs` (number, default `5000`)
+- `sensitivityRules` (array of rule objects)
+
+
+Complete example (comma-separated params are supported):
+
+```
+https://app.company.com/?replay=on,canvas=true,video=true,iframes=true,assets=true,assetsStyles=true,assetsFonts=true,assetsImages=true,cacheAssets=true,backgroundServiceSrc=https%3A%2F%2Fexample.xyz%2Fbackground-service.html
+```
+
+Turn on full-text and input capture (this configuration should be made in the bootstraps):
+
+```js
+maskAllInputs: false,
+maskAllText: false,
+```
+
+Add fine-grained masking/exclusion:
+
+```js
+sensitivityRules: [
+  { rule: "unmask", selector: "p" },
+  { rule: "exclude", selector: "img" },
+  { rule: "mask", selector: ".user-class" }
+],
+```
+
+For additional configuration options, see the Splunk documentation:
+https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md
 
 ## Contents
 
@@ -27,16 +79,6 @@ Both the MPA script and the SPA package support the same URL parameters for enab
 
 ## MPA bootstrap: overview
 
-### Goals
-
-- Provide a single shared JS entry point for RUM + Session Recorder.
-- Enable Session Recorder on demand per session:
-  - `?Replay=on` or `?Replay=true` enables recorder and persists for the current browser session.
-  - No param keeps the recorder off unless previously enabled in the session.
-- Expose Session Recorder parameters as top-level config so teams can tune masking, rules, and features.
-- Avoid requiring application teams for deployment changes.
-- Work for both SPAs and MPAs (React-specific hooks are optional).
-
 ### Behavior
 
 - Included from HTML (for example `index.html`).
@@ -58,62 +100,7 @@ Both the MPA script and the SPA package support the same URL parameters for enab
   - `window.enableReplayPersist()` to set the session flag and enable recorder.
   - `window.enableReplayNow()` to enable recorder immediately without a session flag.
 
-## Recorder parameters
 
-The recorder accepts these optional params:
-
-- `maskAllInputs` (boolean, default `true`)
-- `maskAllText` (boolean, default `true`)
-- `maxExportIntervalMs` (number, default `5000`)
-- `sensitivityRules` (array of rule objects)
-- `features` (object) with keys like `backgroundServiceSrc`, `canvas`, `video`, `iframes`, `packAssets`, `cacheAssets`
-
-URL-driven overrides in both scripts (query params):
-
-- `replay=on|true` enables the recorder for the session.
-- `canvas=true|false`, `video=true|false`, `iframes=true|false`, `cacheAssets=true|false`
-- `assets=true|false` to toggle all `packAssets` entries.
-- `assetsStyles=true|false`, `assetsFonts=true|false`, `assetsImages=true|false` for per-asset control.
-- `backgroundServiceSrc=<url>` to set the background service worker URL.
-
-Complete example (comma-separated params are supported):
-
-```
-https://app.company.com/?replay=on,canvas=true,video=true,iframes=true,assets=true,assetsStyles=true,assetsFonts=true,assetsImages=true,cacheAssets=true,backgroundServiceSrc=https%3A%2F%2Fexample.xyz%2Fbackground-service.html
-```
-
-Turn on full-text and input capture:
-
-```js
-maskAllInputs: false,
-maskAllText: false,
-```
-
-Add fine-grained masking/exclusion:
-
-```js
-sensitivityRules: [
-  { rule: "unmask", selector: "p" },
-  { rule: "exclude", selector: "img" },
-  { rule: "mask", selector: ".user-class" }
-],
-```
-
-Enable advanced features:
-
-```js
-features: {
-  backgroundServiceSrc: "https://example.xyz/background-service.html",
-  canvas: true,
-  video: true,
-  iframes: true,
-  packAssets: { fonts: true, images: true, styles: true },
-  cacheAssets: true
-}
-```
-
-For additional configuration options, see the Splunk documentation:
-https://help.splunk.com/en/splunk-observability-cloud/monitor-end-user-experience/real-user-monitoring/replay-user-sessions/record-browser-sessions
 
 ## SPA and MPA usage without app code changes
 
@@ -140,7 +127,7 @@ Example flow:
 Every HTML page served by that host includes:
 
 ```html
-<script src="https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js"></script>
+<script src="https://cdn.company.com/rum-bootstrap/0.1.0/rumBootstrap.min.js"></script>
 ```
 
 If the user starts with `?Replay=on`:
@@ -155,21 +142,25 @@ Caveats:
 
 ## SPA integration examples
 
-### Include bootstrap in `index.html`
+### Install and initialize in a SPA and capture Route changes as events
 
-```html
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>My SPA</title>
-    <script src="/lib/rumBootstrap.js"></script>
-    <script src="/dist/app.bundle.js" defer></script>
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>
+Recommend hosting the NPM package example in this repo in your company's package repository and calling it (for SPA apps that require route change awareness).  See github workflow for example.
+
+```bash
+npm install @{yourcompany}/rumbootstrap
+```
+
+```tsx
+import { SplunkRumProvider, RumRouterTracker } from "@{yourcompany}/rumbootstrap";
+
+function App() {
+  return (
+    <SplunkRumProvider configOverride={rumConfig}>
+      <RumRouterTracker />
+      {/* your routes/components */}
+    </SplunkRumProvider>
+  );
+}
 ```
 
 ### React Router: auto-enable when `?Replay=on`
@@ -232,14 +223,6 @@ router.afterEach((to) => {
 });
 
 export default router;
-```
-
-### Manual enable in SPA (for a debug menu)
-
-```js
-button.addEventListener("click", () => {
-  window.enableReplayPersist?.();
-});
 ```
 
 ## Recommendations for Enterprise Hosting and Versioning
