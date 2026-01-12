@@ -1,31 +1,35 @@
 # RumBootstrap Shopping SPA TS Demo
 
-## Run
+Example React SPA using the `rumbootstrap` package.
 
-Place this repo next to the library:
+## Run locally
 
-```text
-/workspace
-  /rumbootstrap-lib
-  /rumbootstrap-shopping-spa-ts-demo
-```
-
-Then:
+From the repo root:
 
 ```bash
-cd rumbootstrap-lib
+cd spa-npm
 npm install
 npm run build
 
-cd ../rumbootstrap-shopping-spa-ts-demo
+cd ../spa-demo
 npm install
 npm run dev
 ```
 
+If `spa-demo/package.json` still points to an old local path, update it to:
+
+```jsonc
+{
+  "dependencies": {
+    "rumbootstrap": "file:../spa-npm"
+  }
+}
+```
+
 ## Configuration
 
-Edit `src/rum.config.ts` for realm/token/app/environment.
+Edit `spa-demo/src/rum.config.ts` for realm/token/app/environment.
 
+## Routes for testing
 
-## Additional routes for RUM testing
-This demo includes extra lorem pages (About/Support/Terms) and a product detail route `/product/:id` so you can validate client-side route-change tracking.
+Includes extra routes (About/Support/Terms) and `/product/:id` to validate client-side route-change tracking.
