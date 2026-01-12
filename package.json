@@ -2,10 +2,14 @@
   "name": "splunkrum-examples-workspace",
   "private": true,
   "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0"
+    "rumbootstrap": "file:./spa-npm",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
   }
 }

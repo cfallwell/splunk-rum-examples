@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ES2020",
+    "paths": {
+      "rumbootstrap": ["spa-npm/src/index.ts"]
+    },
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "types": []
+  }
+}
