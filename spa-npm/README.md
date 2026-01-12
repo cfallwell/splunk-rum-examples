@@ -18,7 +18,7 @@ Local file dependency (use when developing or testing the library alongside a lo
 ```jsonc
 {
   "dependencies": {
-    "rumbootstrap": "file:../spa_npm"
+    "rumbootstrap": "file:../spa-npm"
   }
 }
 ```
@@ -37,7 +37,7 @@ Notes:
 
 ## Publish
 
-From `spa_npm/`:
+From `spa-npm/`:
 
 ```bash
 npm login
@@ -64,7 +64,7 @@ This build pins both RUM and Session Recorder to v1.1.0 to avoid version mismatc
 
 Where it is set:
 
-- `spa_npm/src/rumBootstrap.ts` (`RUM_VERSION` constant).
+- `spa-npm/src/rumBootstrap.ts` (`RUM_VERSION` constant).
 
 How to manage it:
 

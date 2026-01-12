@@ -7,7 +7,7 @@ Example React SPA using the `rumbootstrap` package.
 From the repo root:
 
 ```bash
-cd spa_npm
+cd spa-npm
 npm install
 npm run build
 
@@ -21,7 +21,7 @@ If `spa-demo/package.json` still points to an old local path, update it to:
 ```jsonc
 {
   "dependencies": {
-    "rumbootstrap": "file:../spa_npm"
+    "rumbootstrap": "file:../spa-npm"
   }
 }
 ```

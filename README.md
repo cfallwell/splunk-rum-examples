@@ -4,8 +4,8 @@ Collection of Splunk RUM session-recording examples for multi-page apps (MPA) an
 
 ## Contents
 
-- `MPA Script/rumbootstrap.js`: lightweight bootstrapper for classic multi-page sites.
-- `spa_npm/`: reusable TypeScript package for SPA routing-aware tracking.
+- `mpa-script/rumbootstrap.js`: lightweight bootstrapper for classic multi-page sites.
+- `spa-npm/`: reusable TypeScript package for SPA routing-aware tracking.
 - `spa-demo/`: Vite demo app showing the SPA package in a real React flow.
 
 ## Deployment overview
