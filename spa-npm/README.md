@@ -1,4 +1,4 @@
-# rumbootstrap
+# @cfallwell/rumbootstrap
 
 TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 
@@ -7,7 +7,7 @@ TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 From npm:
 
 ```bash
-npm install rumbootstrap
+npm install @cfallwell/rumbootstrap
 ```
 
 Local file dependency (use when developing or testing the library alongside a local app):
@@ -18,7 +18,7 @@ Local file dependency (use when developing or testing the library alongside a lo
 ```jsonc
 {
   "dependencies": {
-    "rumbootstrap": "file:../spa-npm"
+    "@cfallwell/rumbootstrap": "file:../spa-npm"
   }
 }
 ```
@@ -55,7 +55,7 @@ npm pack
 ## Usage (SPA)
 
 ```tsx
-import { SplunkRumProvider, RumRouterTracker, useEnableReplayPersist } from "rumbootstrap";
+import { SplunkRumProvider, RumRouterTracker, useEnableReplayPersist } from "@cfallwell/rumbootstrap";
 ```
 
 ## Configuration defaults

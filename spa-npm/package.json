@@ -1,5 +1,5 @@
 {
-  "name": "rumbootstrap",
+  "name": "@cfallwell/rumbootstrap",
   "version": "1.0.4",
   "description": "Splunk RUM + Session Replay bootstrap utilities for React SPAs",
   "type": "module",
@@ -17,6 +17,9 @@
     "README.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "sideEffects": false,
   "scripts": {
     "clean": "rm -rf dist",

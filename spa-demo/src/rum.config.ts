@@ -1,4 +1,4 @@
-import type { RumConfig } from "rumbootstrap";
+import type { RumConfig } from "@cfallwell/rumbootstrap";
 
 export const rumConfig: RumConfig = {
   realm: "your-realm",

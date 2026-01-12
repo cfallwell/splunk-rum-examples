@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route, Link, NavLink } from "react-router-dom";
-import { RumRouterTracker, useEnableReplayPersist } from "rumbootstrap";
+import { RumRouterTracker, useEnableReplayPersist } from "@cfallwell/rumbootstrap";
 import ProductList from "./ProductList";
 import ProductDetail from "./ProductDetail";
 import Cart from "./Cart";
