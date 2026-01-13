@@ -159,12 +159,15 @@ export const setReplayEnabledForSession = (): void => {
 // RUM INITIALIZATION
 // ----------------------------------------------------
 let rumInitialized = false;
+let activeRumConfig: RumConfig = DEFAULT_RUM_CONFIG;
 
 export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void> => {
   if (rumInitialized) return;
   rumInitialized = true;
 
   const config: RumConfig = { ...DEFAULT_RUM_CONFIG, ...overrideConfig };
+  activeRumConfig = config;
+  window.SplunkRumConfig = config;
 
   await loadScript(RUM_SCRIPT_URL);
 
@@ -182,7 +185,6 @@ export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void
     ignoreUrls: config.ignoreUrls,
   });
 
-  window.SplunkRumConfig = config;
 };
 
 // ----------------------------------------------------
@@ -207,7 +209,7 @@ export const initSessionReplay = async (
   if (replayInitialized) return;
 
   // Ensure RUM is initialized first so tokens/realm are available.
-  const rumConfig = window.SplunkRumConfig ?? DEFAULT_RUM_CONFIG;
+  const rumConfig = window.SplunkRumConfig ?? activeRumConfig ?? DEFAULT_RUM_CONFIG;
 
   await loadReplayScript();
 
