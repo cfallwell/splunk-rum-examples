@@ -1,11 +1,11 @@
 # splunk-rum-examples
 
-This repo contains an NPM package for SPA apps, and Splunk RUM examples for both multi-page apps (MPA) and single-page apps (SPA) that enable on-demand session recording and control via url parameters.
+This repo contains an NPM package for SPA apps, and Splunk RUM examples for both multi-page apps (MPA) and single-page apps (SPA) that enable on-demand session recording via url parameters.
 
 ## Goals
 
 - Provide a single shared JS entry point for RUM + Session Recorder.
-- Enable Session Recorder on demand per session and expose Session Recorder parameters as top-level config so teams can tune masking, rules, and features using url parameters
+- Enable Session Recorder on demand per session with a simple URL parameter.
   - `?Replay=on` or `?Replay=true` enables recorder and persists for the current browser session.
 - Avoid requiring application teams for deployment changes.
 - Work for both SPAs and MPAs (React-specific hooks are optional).
@@ -15,24 +15,17 @@ This repo contains an NPM package for SPA apps, and Splunk RUM examples for both
 URL-parameter editable (MPA + SPA):
 
 - `replay=on|true` enables the recorder for the session.
-- `canvas=true|false`, `video=true|false`, `iframes=true|false`, `cacheAssets=true|false`
-- `assets=true|false` to toggle all `packAssets` entries.
-- `assetsStyles=true|false`, `assetsFonts=true|false`, `assetsImages=true|false` for per-asset control.
-- `backgroundServiceSrc=<url>` to set the background service worker URL.  For more information on the bacground Service Worker, See: https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md#background-service-configuration
 
-Not editable via URL (set in config for security):
+Not editable via URL (set in config for security and consistency):
 
 - `maskAllInputs` (boolean, default `true`)
 - `maskAllText` (boolean, default `true`)
 - `maxExportIntervalMs` (number, default `5000`)
 - `sensitivityRules` (array of rule objects)
 
+Example:
 
-Complete example (comma-separated params are supported):
-
-```
-https://app.company.com/?replay=on,canvas=true,video=true,iframes=true,assets=true,assetsStyles=true,assetsFonts=true,assetsImages=true,cacheAssets=true,backgroundServiceSrc=https%3A%2F%2Fexample.xyz%2Fbackground-service.html
-```
+<https://app.company.com/?replay=on>
 
 Turn on full-text and input capture (this configuration should be made in the bootstraps):
 
@@ -52,7 +45,7 @@ sensitivityRules: [
 ```
 
 For additional configuration options, see the Splunk documentation:
-https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md
+<https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md>
 
 ## Contents
 
@@ -68,7 +61,7 @@ https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-record
 
 ## Common URL controls (MPA + SPA)
 
-Both the MPA script and the SPA package support the same URL parameters for enabling replay and toggling Session Recorder features. See the Recorder parameters section for the full list and an example URL.
+Both the MPA script and the SPA package support the same URL parameter for enabling replay. See the Recorder parameters section for the example URL.
 
 ## Recommendations
 
@@ -99,8 +92,6 @@ Both the MPA script and the SPA package support the same URL parameters for enab
 - Optional SPA hooks:
   - `window.enableReplayPersist()` to set the session flag and enable recorder.
   - `window.enableReplayNow()` to enable recorder immediately without a session flag.
-
-
 
 ## SPA and MPA usage without app code changes
 
