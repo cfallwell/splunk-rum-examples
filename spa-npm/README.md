@@ -58,6 +58,7 @@ Only the following URL params are supported for enabling Session Replay:
 - `godmode=on|true` (enables all features and sets `maskAllInputs=false` and `maskAllText=false`)
 
 Legacy params like `canvas` or `assets` are no longer supported.
+This change is a breaking update for any existing replay URLs.
 
 ## Version pinning
 
