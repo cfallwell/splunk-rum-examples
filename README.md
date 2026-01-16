@@ -71,6 +71,7 @@ The recorder accepts these optional params:
 URL-driven overrides in both scripts (query params):
 
 - `replay=on|true` enables the recorder for the session.
+- `godmode=true` enables all features and sets `maskAllInputs=false` and `maskAllText=false`.
 - `canvas=true|false`, `video=true|false`, `iframes=true|false`, `cacheAssets=true|false`
 - `assets=true|false` to toggle all `packAssets` entries.
 - `assetsStyles=true|false`, `assetsFonts=true|false`, `assetsImages=true|false` for per-asset control.
@@ -79,7 +80,7 @@ URL-driven overrides in both scripts (query params):
 Complete example (comma-separated params are supported):
 
 ```
-https://app.company.com/?replay=on,canvas=true,video=true,iframes=true,assets=true,assetsStyles=true,assetsFonts=true,assetsImages=true,cacheAssets=true,backgroundServiceSrc=https%3A%2F%2Fexample.xyz%2Fbackground-service.html
+https://app.company.com/?replay=on,godmode=true,backgroundServiceSrc=https%3A%2F%2Fexample.xyz%2Fbackground-service.html
 ```
 
 Turn on full-text and input capture:

@@ -127,6 +127,7 @@
   const applyFeatureParamsFromUrl = () => {
     try {
       const params = getUrlParams();
+      const godmode = parseBooleanParam(params.get("godmode"));
 
       const canvas = parseBooleanParam(params.get("canvas"));
       if (typeof canvas === "boolean") {
@@ -177,6 +178,20 @@
       const backgroundServiceSrc = params.get("backgroundServiceSrc");
       if (backgroundServiceSrc) {
         SESSION_RECORDER_OPTIONS.features.backgroundServiceSrc = backgroundServiceSrc;
+      }
+
+      if (godmode === true) {
+        SESSION_RECORDER_OPTIONS.maskAllInputs = false;
+        SESSION_RECORDER_OPTIONS.maskAllText = false;
+        SESSION_RECORDER_OPTIONS.features.canvas = true;
+        SESSION_RECORDER_OPTIONS.features.video = true;
+        SESSION_RECORDER_OPTIONS.features.iframes = true;
+        SESSION_RECORDER_OPTIONS.features.cacheAssets = true;
+        SESSION_RECORDER_OPTIONS.features.packAssets = {
+          styles: true,
+          fonts: true,
+          images: true
+        };
       }
     } catch {
       // Ignore malformed URL params; fall back to defaults.

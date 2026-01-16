@@ -97,6 +97,7 @@ const applyReplayParamsFromUrl = (config: SessionReplayConfig): void => {
       typeof currentFeatures === "object" && currentFeatures !== null
         ? { ...(currentFeatures as Record<string, unknown>) }
         : {};
+    const godmode = parseBooleanParam(params.get("godmode"));
 
     const canvas = parseBooleanParam(params.get("canvas"));
     if (typeof canvas === "boolean") features.canvas = canvas;
@@ -138,6 +139,16 @@ const applyReplayParamsFromUrl = (config: SessionReplayConfig): void => {
 
     const backgroundServiceSrc = params.get("backgroundServiceSrc");
     if (backgroundServiceSrc) features.backgroundServiceSrc = backgroundServiceSrc;
+
+    if (godmode === true) {
+      cfg.maskAllInputs = false;
+      cfg.maskAllText = false;
+      features.canvas = true;
+      features.video = true;
+      features.iframes = true;
+      features.cacheAssets = true;
+      features.packAssets = { styles: true, fonts: true, images: true };
+    }
 
     if (Object.keys(features).length > 0) {
       cfg.features = features;
