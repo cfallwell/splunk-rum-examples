@@ -25,9 +25,7 @@ Not editable via URL (set in config for security and consistency):
 
 Example:
 
-```
-https://app.company.com/?replay=on
-```
+<https://app.company.com/?replay=on>
 
 Turn on full-text and input capture (this configuration should be made in the bootstraps):
 
@@ -47,7 +45,7 @@ sensitivityRules: [
 ```
 
 For additional configuration options, see the Splunk documentation:
-https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md
+<https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md>
 
 ## Contents
 
@@ -94,8 +92,6 @@ Both the MPA script and the SPA package support the same URL parameter for enabl
 - Optional SPA hooks:
   - `window.enableReplayPersist()` to set the session flag and enable recorder.
   - `window.enableReplayNow()` to enable recorder immediately without a session flag.
-
-
 
 ## SPA and MPA usage without app code changes
 
