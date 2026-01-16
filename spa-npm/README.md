@@ -2,27 +2,6 @@
 
 TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 
-## Install
-
-From npm:
-
-```bash
-npm install @cfallwell/rumbootstrap
-```
-
-Local file dependency (use when developing or testing the library alongside a local app):
-
-- Use this when the app repo and this repo live side-by-side on disk and you want changes in the library to be picked up immediately.
-- Prefer this for local development or CI smoke tests; use the npm install from the registry for production consumption.
-
-```jsonc
-{
-  "dependencies": {
-    "@cfallwell/rumbootstrap": "file:../spa-npm"
-  }
-}
-```
-
 ## Build
 
 ```bash

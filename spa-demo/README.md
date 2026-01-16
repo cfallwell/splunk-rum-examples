@@ -1,6 +1,6 @@
 # RumBootstrap Shopping SPA TS Demo
 
-Example React SPA using the `@cfallwell/rumbootstrap` package.
+Example React SPA using the `/spa-npm` package.
 
 ## Run locally
 
@@ -14,16 +14,6 @@ npm run build
 cd ../spa-demo
 npm install
 npm run dev
-```
-
-If `spa-demo/package.json` still points to an old local path, update it to:
-
-```jsonc
-{
-  "dependencies": {
-    "@cfallwell/rumbootstrap": "file:../spa-npm"
-  }
-}
 ```
 
 ## Configuration

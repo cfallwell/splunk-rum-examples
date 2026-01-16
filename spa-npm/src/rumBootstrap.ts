@@ -88,71 +88,27 @@ const parseBooleanParam = (value: string | null): boolean | undefined => {
   return undefined;
 };
 
-const applyReplayParamsFromUrl = (config: SessionReplayConfig): void => {
+const applyGodmodeParamFromUrl = (config: SessionReplayConfig): void => {
   try {
     const params = getUrlParams();
+    const godmode = parseBooleanParam(params.get("godmode"));
+    if (godmode !== true) return;
+
     const cfg = config as Record<string, unknown>;
     const currentFeatures = cfg.features;
     const features =
       typeof currentFeatures === "object" && currentFeatures !== null
         ? { ...(currentFeatures as Record<string, unknown>) }
         : {};
-    const godmode = parseBooleanParam(params.get("godmode"));
 
-    const canvas = parseBooleanParam(params.get("canvas"));
-    if (typeof canvas === "boolean") features.canvas = canvas;
-
-    const video = parseBooleanParam(params.get("video"));
-    if (typeof video === "boolean") features.video = video;
-
-    const iframes = parseBooleanParam(params.get("iframes"));
-    if (typeof iframes === "boolean") features.iframes = iframes;
-
-    const cacheAssets = parseBooleanParam(params.get("cacheAssets"));
-    if (typeof cacheAssets === "boolean") features.cacheAssets = cacheAssets;
-
-    const assets = parseBooleanParam(params.get("assets"));
-    const assetsStyles = parseBooleanParam(params.get("assetsStyles"));
-    const assetsFonts = parseBooleanParam(params.get("assetsFonts"));
-    const assetsImages = parseBooleanParam(params.get("assetsImages"));
-
-    if (assets === false) {
-      features.packAssets = false;
-    } else if (
-      assets === true ||
-      typeof assetsStyles === "boolean" ||
-      typeof assetsFonts === "boolean" ||
-      typeof assetsImages === "boolean"
-    ) {
-      const packAssets: Record<string, boolean> = {
-        styles: assets === true,
-        fonts: assets === true,
-        images: assets === true,
-      };
-
-      if (typeof assetsStyles === "boolean") packAssets.styles = assetsStyles;
-      if (typeof assetsFonts === "boolean") packAssets.fonts = assetsFonts;
-      if (typeof assetsImages === "boolean") packAssets.images = assetsImages;
-
-      features.packAssets = packAssets;
-    }
-
-    const backgroundServiceSrc = params.get("backgroundServiceSrc");
-    if (backgroundServiceSrc) features.backgroundServiceSrc = backgroundServiceSrc;
-
-    if (godmode === true) {
-      cfg.maskAllInputs = false;
-      cfg.maskAllText = false;
-      features.canvas = true;
-      features.video = true;
-      features.iframes = true;
-      features.cacheAssets = true;
-      features.packAssets = { styles: true, fonts: true, images: true };
-    }
-
-    if (Object.keys(features).length > 0) {
-      cfg.features = features;
-    }
+    cfg.maskAllInputs = false;
+    cfg.maskAllText = false;
+    features.canvas = true;
+    features.video = true;
+    features.iframes = true;
+    features.cacheAssets = true;
+    features.packAssets = { styles: true, fonts: true, images: true };
+    cfg.features = features;
   } catch {
     // Ignore malformed URL params; fall back to provided config.
   }
@@ -170,12 +126,15 @@ export const setReplayEnabledForSession = (): void => {
 // RUM INITIALIZATION
 // ----------------------------------------------------
 let rumInitialized = false;
+let activeRumConfig: RumConfig = DEFAULT_RUM_CONFIG;
 
 export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void> => {
   if (rumInitialized) return;
   rumInitialized = true;
 
   const config: RumConfig = { ...DEFAULT_RUM_CONFIG, ...overrideConfig };
+  activeRumConfig = config;
+  window.SplunkRumConfig = config;
 
   await loadScript(RUM_SCRIPT_URL);
 
@@ -193,7 +152,6 @@ export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void
     ignoreUrls: config.ignoreUrls,
   });
 
-  window.SplunkRumConfig = config;
 };
 
 // ----------------------------------------------------
@@ -218,7 +176,7 @@ export const initSessionReplay = async (
   if (replayInitialized) return;
 
   // Ensure RUM is initialized first so tokens/realm are available.
-  const rumConfig = window.SplunkRumConfig ?? DEFAULT_RUM_CONFIG;
+  const rumConfig = window.SplunkRumConfig ?? activeRumConfig ?? DEFAULT_RUM_CONFIG;
 
   await loadReplayScript();
 
@@ -240,7 +198,7 @@ export const initSessionReplay = async (
     ...(replayConfigOverride ?? {}),
   };
 
-  applyReplayParamsFromUrl(replayConfig);
+  applyGodmodeParamFromUrl(replayConfig);
 
   recorder.init(replayConfig);
   window.SplunkSessionReplayConfig = replayConfig;
