@@ -16,6 +16,7 @@ URL-parameter editable (MPA + SPA) — only the options below are supported:
 
 - `replay=on|true` enables the recorder for the session.
 - `godmode=on|true` enables all features and sets `maskAllInputs=false` and `maskAllText=false`.
+  - Breaking change: legacy URL params like `canvas` or `assets` are no longer supported.
 
 Not editable via URL (set in config for security and consistency):
 
