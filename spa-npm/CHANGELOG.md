@@ -4,6 +4,11 @@
 
 - No unreleased changes.
 
+## 2.1.2
+
+- Updated the package README shown on GitHub Packages to include auto-synced current version and latest update details.
+- Extended metadata sync automation so both `package.json` description and README release summary are refreshed from changelog entries.
+
 ## 2.1.1
 
 - Added automatic package metadata sync so the npm description always includes the current version and latest changelog summary.
