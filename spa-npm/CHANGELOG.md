@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- No unreleased changes.
+
+## 2.1.1
+
+- Added automatic package metadata sync so the npm description always includes the current version and latest changelog summary.
+- Updated package description generation to include the current version and latest update summary with a changelog pointer.
+
 ## 2.1.0
 
 - Fixed intermittent Session Replay ingest failures caused by recorder initialization with placeholder realm/token values.
