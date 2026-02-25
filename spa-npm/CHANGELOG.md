@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0
+
+- Fixed intermittent Session Replay ingest failures caused by recorder initialization with placeholder realm/token values.
+- Added a replay credential guard to skip recorder init until real `realm` and `rumAccessToken` are available.
+- Ensured runtime config updates always refresh the active replay credentials before replay init.
+
 ## 2.0.0
 
 ## URL parameters (breaking change)

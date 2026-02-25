@@ -80,6 +80,19 @@ const getUrlParams = (): URLSearchParams => {
   return new URLSearchParams(normalized);
 };
 
+const isPlaceholderValue = (value: string): boolean => {
+  const v = value.trim().toLowerCase();
+  return v.startsWith("your_") || v.startsWith("your-");
+};
+
+const hasValidReplayCredentials = (config: RumConfig): boolean => {
+  const realm = config.realm?.trim();
+  const token = config.rumAccessToken?.trim();
+  if (!realm || !token) return false;
+  if (isPlaceholderValue(realm) || isPlaceholderValue(token)) return false;
+  return true;
+};
+
 const isEnabledParam = (value: string | null): boolean => {
   if (value == null) return false;
   const v = value.toLowerCase();
@@ -127,12 +140,12 @@ let rumInitialized = false;
 let activeRumConfig: RumConfig = DEFAULT_RUM_CONFIG;
 
 export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void> => {
-  if (rumInitialized) return;
-  rumInitialized = true;
-
   const config: RumConfig = { ...DEFAULT_RUM_CONFIG, ...overrideConfig };
   activeRumConfig = config;
   window.SplunkRumConfig = config;
+
+  if (rumInitialized) return;
+  rumInitialized = true;
 
   await loadScript(RUM_SCRIPT_URL);
 
@@ -149,7 +162,6 @@ export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void
     debug: config.debug,
     ignoreUrls: config.ignoreUrls,
   });
-
 };
 
 // ----------------------------------------------------
@@ -175,6 +187,10 @@ export const initSessionReplay = async (
 
   // Ensure RUM is initialized first so tokens/realm are available.
   const rumConfig = window.SplunkRumConfig ?? activeRumConfig ?? DEFAULT_RUM_CONFIG;
+  if (!hasValidReplayCredentials(rumConfig)) {
+    console.warn("[Session Replay] Skipping init because realm/token are not configured.");
+    return;
+  }
 
   await loadReplayScript();
 
