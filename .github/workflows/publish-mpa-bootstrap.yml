@@ -1,0 +1,57 @@
+name: Publish MPA Bootstrap Asset
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to upload assets to (example: v2.1.2)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve release tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.tag.outputs.value }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build minified MPA bootstrap
+        run: |
+          mkdir -p dist/mpa
+          cp mpa-script/rumbootstrap.js dist/mpa/rumbootstrap.js
+          npx --yes terser mpa-script/rumbootstrap.js \
+            --compress --mangle \
+            --output dist/mpa/rumbootstrap.min.js
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.tag.outputs.value }}
+        run: |
+          gh release upload "$RELEASE_TAG" \
+            dist/mpa/rumbootstrap.js \
+            dist/mpa/rumbootstrap.min.js \
+            --clobber
