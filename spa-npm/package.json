@@ -1,6 +1,6 @@
 {
   "name": "@cfallwell/rumbootstrap",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "v2.1.2: Updated the package README shown on GitHub Packages to include auto-synced current version and latest update details. (+1 more updates in CHANGELOG.md)",
   "changelog": "CHANGELOG.md",
   "type": "module",
