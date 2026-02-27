@@ -7,9 +7,9 @@ TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 Latest release notes live in `CHANGELOG.md`.
 
 <!-- release:auto:start -->
-- Current version: `v2.1.2`
-- Latest update: Updated the package README shown on GitHub Packages to include auto-synced current version and latest update details.
-- Additional updates: 1 (see `CHANGELOG.md`)
+- Current version: `v3.0.0`
+- Latest update: URL params are limited to replay and godmode only.
+- Additional updates: 2 (see `CHANGELOG.md`)
 <!-- release:auto:end -->
 
 ## Build

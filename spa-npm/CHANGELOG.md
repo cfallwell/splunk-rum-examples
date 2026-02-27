@@ -4,6 +4,20 @@
 
 - No unreleased changes.
 
+## 3.0.0
+
+### Breaking changes
+
+- URL params are limited to `replay` and `godmode` only.
+
+### Features
+
+- Documented replay URL breaking change.
+
+### Bug fixes
+
+- Stabilized Session Replay initialization to avoid placeholder realm/token usage.
+
 ## 2.1.2
 
 - Updated the package README shown on GitHub Packages to include auto-synced current version and latest update details.

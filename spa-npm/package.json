@@ -1,7 +1,7 @@
 {
   "name": "@cfallwell/rumbootstrap",
   "version": "3.0.0",
-  "description": "v2.1.2: Updated the package README shown on GitHub Packages to include auto-synced current version and latest update details. (+1 more updates in CHANGELOG.md)",
+  "description": "v3.0.0: URL params are limited to replay and godmode only. (+2 more updates in CHANGELOG.md)",
   "changelog": "CHANGELOG.md",
   "type": "module",
   "main": "./dist/index.js",
