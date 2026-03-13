@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.0.0
+
+- Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (`async = false`, `defer = false`).
 ## Unreleased
 
 - No unreleased changes.

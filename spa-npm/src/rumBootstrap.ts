@@ -55,8 +55,8 @@ const loadScript = (src: string): Promise<void> =>
   new Promise((resolve, reject) => {
     // IMPORTANT: only call this when you truly want to load the script.
     const el = document.createElement("script");
-    el.async = true;
-    el.defer = true;
+    el.async = false;
+    el.defer = false;
     el.src = src;
     el.crossOrigin = "anonymous";
     el.onload = () => resolve();

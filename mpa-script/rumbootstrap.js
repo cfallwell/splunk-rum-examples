@@ -150,7 +150,8 @@
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
       const s = document.createElement("script");
-      s.async = true;
+      s.async = false;
+      s.defer = false;
       s.src = src;
       s.crossOrigin = "anonymous";
       s.onload = resolve;
