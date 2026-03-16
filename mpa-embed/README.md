@@ -2,6 +2,23 @@
 
 App-team example for embedding the SignalFx RUM and session-recorder scripts directly inside an application repository.
 
+The bootstrap should be the first script loaded by the application. A typical MPA launch point looks like this:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="/rum/rumbootstrap.js"></script>
+    <script src="/assets/app.js" defer></script>
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>
+```
+
+Place `rumbootstrap.js` first in the `<head>` of the main entry page, such as `index.html`.
+
 Files in this folder mirror the `mpa-script` bootstrap shape, but the intent is different:
 
 - `mpa-embed/rumbootstrap.js` is the generated bootstrap your app repo would check in.

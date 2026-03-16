@@ -7,14 +7,14 @@ TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 Latest release notes live in `CHANGELOG.md`.
 
 <!-- release:auto:start -->
-- Current version: `v1.0.1`
-- Latest update: Added mpa-embed as an app-team example for embedding the SignalFx RUM and session-recorder scripts locally inside a frontend repository.
+- Current version: `v1.0.2`
+- Latest update: Clarified in the root README that the RUM bootstrap should load first in every supported delivery model.
 - Additional updates: 2 (see `CHANGELOG.md`)
 
 Release notes for this version:
-- Added mpa-embed as an app-team example for embedding the SignalFx RUM and session-recorder scripts locally inside a frontend repository.
-- Added dedicated mpa-embed generate and update scripts, with version discovery pointed at the internal object-store release path https://artifactory.company.com/signalfx/rum-scripts/releases/.
-- Added a platform-side staging script and example Jenkins pipeline that publish the versioned SignalFx script files to the same Artifactory path consumed by mpa-embed.
+- Clarified in the root README that the RUM bootstrap should load first in every supported delivery model.
+- Added SPA load-order guidance in the root README and pointed readers to spa-demo/src/main.tsx as the reference integration point.
+- Added an index.html example to the mpa-embed README showing rumbootstrap.js as the first script in the page <head>.
 <!-- release:auto:end -->
 
 ## Build
