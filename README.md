@@ -121,6 +121,239 @@ Package-specific build and publish steps live in [`spa-npm/README.md`](./spa-npm
 - App-team local embed example: [`mpa-embed/rumbootstrap.js`](./mpa-embed/rumbootstrap.js)
 - Example Jenkins Artifactory publish job for the shared SignalFx release files: [`jenkins/Jenkinsfile.mpa-signalfx-artifactory`](./jenkins/Jenkinsfile.mpa-signalfx-artifactory)
 
+## Script Usage and Scenarios
+
+All commands below are intended to run from the repo root unless a package-local path is shown.
+
+### End-to-end release flow
+
+Use these scripts in this order when you are cutting a new internal release from a newer SignalFx browser SDK:
+
+1. Refresh the checked-in SignalFx assets with `npm run signalfx:update -- <release>`.
+2. Bump the package/bootstrap version with `npm run release:set-version -- <version>`.
+3. Stage the MPA SignalFx artifacts for internal publishing with `npm run mpa-script:stage-signalfx-release`.
+4. If an app-team local embed is maintained from the internal object store, refresh that copy with `npm run mpa-embed:update -- <release>`.
+
+### `signalfx:update`
+
+Scenario:
+Use this when the platform team wants to pull a newer published SignalFx RUM browser release from GitHub/CDN into the repo and regenerate all checked-in embedded outputs that depend on it.
+
+Usage:
+
+```bash
+npm run signalfx:update -- v2.15.0
+```
+
+Direct invocation:
+
+```bash
+node scripts/update-signalfx-scripts.mjs v2.15.0
+```
+
+What it does:
+
+- Downloads `splunk-otel-web.js` and `splunk-otel-web-session-recorder.js` for the selected upstream release.
+- Updates both `spa-npm/src/signalfx/*` and `mpa-script/src/signalfx/*`.
+- Writes matching `manifest.json` files in both locations.
+- Runs `scripts/generate-rum-embeds.mjs` to regenerate `spa-npm/src/signalfx/embeddedSources.ts` and `mpa-script/rumbootstrap.js`.
+
+Notes:
+
+- Pass a concrete version such as `v2.15.0` or `2.15.0`.
+- If you omit the version in an interactive terminal, the script shows a numbered release picker.
+- The `latest` alias is intentionally rejected so releases stay explicit and reproducible.
+
+### `release:set-version`
+
+Scenario:
+Use this when you are publishing a new internal version of the hosted bootstrap and SPA package after code or asset changes are ready.
+
+Usage:
+
+```bash
+npm run release:set-version -- 1.0.3
+```
+
+Direct invocation:
+
+```bash
+node scripts/set-release-version.mjs 1.0.3
+```
+
+What it does:
+
+- Updates `spa-npm/package.json` to the requested version.
+- Regenerates embedded outputs by running `scripts/generate-rum-embeds.mjs`.
+- Runs `npm --prefix spa-npm run sync:description` so the package description and README release block reflect the new changelog entry.
+
+Notes:
+
+- Provide the final package/bootstrap version only; the script strips a leading `v` if present.
+- Run this after the changelog entry for the new version exists so the generated description and README metadata stay meaningful.
+
+### `mpa-script:stage-signalfx-release`
+
+Scenario:
+Use this when you need a ready-to-publish folder of SignalFx browser SDK artifacts for your internal object store, Artifactory, or CDN release job.
+
+Usage:
+
+```bash
+npm run mpa-script:stage-signalfx-release
+```
+
+Direct invocation:
+
+```bash
+node scripts/stage-mpa-signalfx-release.mjs
+```
+
+What it does:
+
+- Reads the current release metadata from `mpa-script/src/signalfx/manifest.json`.
+- Creates `dist/signalfx/rum-scripts/releases/<release>/`.
+- Copies the two browser SDK files into that directory.
+- Writes `manifest.json` and a `release.json` summary with the expected object-store path.
+
+Notes:
+
+- Run this after `signalfx:update` so the staged folder matches the checked-in manifest and SDK files.
+- This script stages files locally only; the actual upload is handled by your CI or release job.
+
+### `mpa-embed:update`
+
+Scenario:
+Use this when an app-team-local embed should be refreshed from the internally approved SignalFx release artifacts instead of downloading directly from the public SignalFx CDN.
+
+Usage:
+
+```bash
+npm run mpa-embed:update -- v1.2.0
+```
+
+Direct invocation:
+
+```bash
+node scripts/update-mpa-embed-signalfx-scripts.mjs v1.2.0
+```
+
+What it does:
+
+- Lists available releases from the internal object-store path `https://artifactory.company.com/signalfx/rum-scripts/releases/`.
+- Downloads the selected release into `mpa-embed/src/signalfx/`.
+- Rewrites `mpa-embed/src/signalfx/manifest.json`.
+- Runs `scripts/generate-mpa-embed.mjs` to regenerate `mpa-embed/rumbootstrap.js`.
+
+Notes:
+
+- In an interactive shell, you can omit the version and choose from the numbered list.
+- In CI or other non-interactive environments, provide the release explicitly.
+- Use this for the `mpa-embed` example only; it does not update `spa-npm` or `mpa-script`.
+
+### `mpa-embed:generate`
+
+Scenario:
+Use this when you already updated files under `mpa-embed/src/signalfx/` or changed the `mpa-embed` bootstrap template and only need to rebuild the generated standalone output.
+
+Usage:
+
+```bash
+npm run mpa-embed:generate
+```
+
+Direct invocation:
+
+```bash
+node scripts/generate-mpa-embed.mjs
+```
+
+What it does:
+
+- Reads `mpa-embed/src/signalfx/manifest.json`.
+- Base64-embeds the checked-in SignalFx browser scripts from `mpa-embed/src/signalfx/`.
+- Applies those values to `mpa-embed/src/rumbootstrap.template.js`.
+- Writes the generated output to `mpa-embed/rumbootstrap.js`.
+
+Notes:
+
+- This is a local regeneration helper; it does not download anything.
+- `mpa-embed:update` already calls this script automatically after downloading a release.
+
+### `generate-rum-embeds.mjs`
+
+Scenario:
+Use this when you changed shared embedded assets or the main MPA template and need to regenerate the derived files without bumping versions or downloading new SDKs.
+
+Usage:
+
+```bash
+node scripts/generate-rum-embeds.mjs
+```
+
+What it does:
+
+- Reads `spa-npm/src/signalfx/manifest.json` and the checked-in browser SDK files under `spa-npm/src/signalfx/`.
+- Regenerates `spa-npm/src/signalfx/embeddedSources.ts`.
+- Applies the same embedded values to `mpa-script/src/rumbootstrap.template.js`.
+- Writes the generated MPA output to `mpa-script/rumbootstrap.js`.
+
+Notes:
+
+- This script is called automatically by `signalfx:update` and `release:set-version`.
+- Run it directly only when you intentionally edited the template or embedded source files by hand.
+
+### `extract-changelog-section.mjs`
+
+Scenario:
+Use this in release automation when you need a standalone markdown fragment for one specific version, such as GitHub release notes or an artifact attached to a pipeline.
+
+Usage:
+
+```bash
+node scripts/extract-changelog-section.mjs spa-npm/CHANGELOG.md 1.0.3 dist/release-notes.md
+```
+
+What it does:
+
+- Finds the `## 1.0.3` or `## v1.0.3` section in the target changelog.
+- Extracts only that version's body until the next `##` heading.
+- Writes a normalized markdown file beginning with `## v1.0.3`.
+
+Notes:
+
+- This script is intended for automation and is not exposed as a root npm alias today.
+- It exits with an error if the changelog section is missing or empty.
+
+### `spa-npm/scripts/sync-package-description.mjs`
+
+Scenario:
+Use this when the `spa-npm` changelog has been updated and you want package metadata and the package README release summary block to match the current `spa-npm/package.json` version.
+
+Usage:
+
+```bash
+npm --prefix spa-npm run sync:description
+```
+
+Direct invocation from `spa-npm/`:
+
+```bash
+node scripts/sync-package-description.mjs
+```
+
+What it does:
+
+- Reads the current version from `spa-npm/package.json`.
+- Pulls the matching section from `spa-npm/CHANGELOG.md`.
+- Updates the package `description` field with a short summary for that version.
+- Rewrites the auto-managed release block inside `spa-npm/README.md`.
+
+Notes:
+
+- `release:set-version` and the `spa-npm` build flow already call this for you.
+- If the changelog heading for the current version is missing, the script leaves metadata unchanged and exits successfully after a warning.
+
 ## Optional Recorder Settings
 
 Set these in the hosted script or package config, not from URL parameters:
