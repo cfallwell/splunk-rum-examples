@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Documented all repo scripts in the root README, including usage instructions, release-flow order, and the scenarios for each helper.
+
 ## 1.0.2
 
 - Clarified in the root README that the RUM bootstrap should load first in every supported delivery model.
