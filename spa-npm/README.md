@@ -7,14 +7,12 @@ TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 Latest release notes live in `CHANGELOG.md`.
 
 <!-- release:auto:start -->
-- Current version: `v1.0.2`
-- Latest update: Clarified in the root README that the RUM bootstrap should load first in every supported delivery model.
-- Additional updates: 2 (see `CHANGELOG.md`)
+- Current version: `v1.0.3`
+- Latest update: Documented all repo scripts in the root README, including usage instructions, release-flow order, and the scenarios for each helper.
+- Additional updates: 0 (see `CHANGELOG.md`)
 
 Release notes for this version:
-- Clarified in the root README that the RUM bootstrap should load first in every supported delivery model.
-- Added SPA load-order guidance in the root README and pointed readers to spa-demo/src/main.tsx as the reference integration point.
-- Added an index.html example to the mpa-embed README showing rumbootstrap.js as the first script in the page <head>.
+- Documented all repo scripts in the root README, including usage instructions, release-flow order, and the scenarios for each helper.
 <!-- release:auto:end -->
 
 ## Build
