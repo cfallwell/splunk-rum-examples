@@ -1,6 +1,6 @@
 {
   "name": "@cfallwell/rumbootstrap",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "v4.0.0: Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (async = false, defer = false).",
   "changelog": "CHANGELOG.md",
   "type": "module",
