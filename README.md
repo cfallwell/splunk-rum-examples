@@ -1,9 +1,10 @@
 # splunk-rum-examples
 
-This repo shows two ways to deliver Splunk RUM and on-demand Session Replay from a centrally managed platform workflow:
+This repo shows three ways to deliver Splunk RUM and on-demand Session Replay:
 
-- Host a shared browser bootstrap for classic multi-page apps and no-code edge injection.
-- Publish a shared SPA package for React apps that need router-aware tracking.
+- App teams can embed the bootstrap and SignalFx browser scripts directly in their own frontend repositories.
+- Platform teams can host and inject a shared browser bootstrap through a central delivery point.
+- React teams can install a shared npm package for router-aware SPA tracking.
 
 The goal is to let a platform team host, version, and roll out RUM internally without forcing every product team to build its own bootstrap.
 
@@ -52,14 +53,25 @@ Example:
 
 ## Recommended Internal Distribution Model
 
-### Option 1: Centrally hosted browser bootstrap
+### Option 1: App-team local embed
 
-Use this when the platform team wants the fastest rollout path for many apps.
+Use this when an application team wants the SignalFx browser scripts stored directly in its own frontend repository and deployment pipeline.
+
+- Check the generated bootstrap and the minified SignalFx script files into the application repo.
+- Refresh the local script files from the internal object-store release path when a new version is approved.
+- Keep the bootstrap and the embedded SignalFx files versioned in the app repo like any other frontend asset.
+- Load the bootstrap as the first script in the main HTML launch point.
+
+See [`mpa-embed/README.md`](./mpa-embed/README.md) for the app-team example.
+
+### Option 2: Platform-hosted browser bootstrap
+
+Use this when the platform team wants the fastest rollout path for many apps and can inject or centrally host the bootstrap.
 
 - Keep a versioned copy of [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js) in an internal repo or release pipeline.
 - Publish it to an internal CDN or object store.
 - Inject it into HTML responses from the edge or shared layout.
-- Let product teams opt into replay by opening the app with `?replay=on`.
+- Follow the deployment scenarios later in this README for edge, ingress, or central-entrypoint rollout patterns.
 - Load it before any other application scripts.
 
 Example script tag:
@@ -68,7 +80,7 @@ Example script tag:
 <script src="https://cdn.internal.company.com/rum-bootstrap/0.1.0/rumBootstrap.min.js"></script>
 ```
 
-### Option 2: Internal SPA package
+### Option 3: Internal SPA package
 
 Use this when React apps need route tracking and typed integration points.
 
