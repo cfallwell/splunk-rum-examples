@@ -1,7 +1,7 @@
 {
   "name": "@cfallwell/rumbootstrap",
-  "version": "1.0.1",
-  "description": "v1.0.1: Added mpa-embed as an app-team example for embedding the SignalFx RUM and session-recorder scripts locally inside a frontend repository. (+2 more updates in CHANGELOG.md)",
+  "version": "1.0.2",
+  "description": "v1.0.2: Clarified in the root README that the RUM bootstrap should load first in every supported delivery model. (+2 more updates in CHANGELOG.md)",
   "changelog": "CHANGELOG.md",
   "type": "module",
   "main": "./dist/index.js",

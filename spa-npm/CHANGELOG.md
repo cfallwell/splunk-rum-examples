@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+- Clarified in the root README that the RUM bootstrap should load first in every supported delivery model.
+- Added SPA load-order guidance in the root README and pointed readers to `spa-demo/src/main.tsx` as the reference integration point.
+- Added an `index.html` example to the `mpa-embed` README showing `rumbootstrap.js` as the first script in the page `<head>`.
+
 ## 1.0.1
 
 - Added `mpa-embed` as an app-team example for embedding the SignalFx RUM and session-recorder scripts locally inside a frontend repository.

@@ -7,6 +7,8 @@ This repo shows two ways to deliver Splunk RUM and on-demand Session Replay from
 
 The goal is to let a platform team host, version, and roll out RUM internally without forcing every product team to build its own bootstrap.
 
+In all supported models, the RUM bootstrap should be the first script that loads so the session is captured from the earliest possible point in the application lifecycle.
+
 ## What to use
 
 - [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js): standalone browser bootstrap for MPAs and simple SPAs.
@@ -58,6 +60,7 @@ Use this when the platform team wants the fastest rollout path for many apps.
 - Publish it to an internal CDN or object store.
 - Inject it into HTML responses from the edge or shared layout.
 - Let product teams opt into replay by opening the app with `?replay=on`.
+- Load it before any other application scripts.
 
 Example script tag:
 
@@ -72,6 +75,7 @@ Use this when React apps need route tracking and typed integration points.
 - Build and publish the package from [`spa-npm`](./spa-npm).
 - Ask app teams to install it from your internal package registry.
 - Initialize it once near the app root and include router tracking where needed.
+- Load it before the rest of the SPA app tree. See [`spa-demo/src/main.tsx`](./spa-demo/src/main.tsx) for the reference integration point.
 
 Minimal example:
 
