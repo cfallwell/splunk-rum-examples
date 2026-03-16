@@ -60,6 +60,7 @@ For additional configuration options, see the Splunk documentation:
 - Choose MPA or SPA integration.
 - Configure Splunk RUM settings (realm, access token, app name, environment) in the script/package.
 - The repo vendors the minified Splunk browser SDK into `src/vendor` and embeds it locally at runtime, so the bootstrapper does not fetch the SDK from the CDN.
+- The embedded `<script>` tags are stamped with bootstrap and upstream vendor version metadata via `data-rum-bootstrap-version` and `data-rum-vendor-version`.
 - Deploy with your normal release pipeline so the bootstrapper is versioned and cacheable.
 
 ## Common URL controls (MPA + SPA)

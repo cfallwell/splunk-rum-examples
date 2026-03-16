@@ -1,6 +1,11 @@
 import {
+  LOCAL_RUM_BOOTSTRAP_VERSION,
   SPLUNK_RUM_SCRIPT_BASE64,
+  SPLUNK_RUM_VENDOR_VERSION,
   SPLUNK_SESSION_REPLAY_SCRIPT_BASE64,
+  SPLUNK_SESSION_REPLAY_VENDOR_VERSION,
+  SPLUNK_VENDOR_FETCHED_AT,
+  SPLUNK_VENDOR_SOURCE,
 } from "./vendor/embeddedSources";
 
 // src/rumBootstrap.ts
@@ -49,7 +54,11 @@ const REPLAY_ENABLE_VALUES = new Set(["on", "true"]);
 // ----------------------------------------------------
 const decodeBase64 = (value: string): string => window.atob(value);
 
-const loadEmbeddedScript = (id: string, sourceBase64: string): Promise<void> =>
+const loadEmbeddedScript = (
+  id: string,
+  sourceBase64: string,
+  upstreamVersion: string
+): Promise<void> =>
   new Promise((resolve, reject) => {
     if (document.querySelector(`script[data-rum-embed="${id}"]`)) {
       resolve();
@@ -60,6 +69,10 @@ const loadEmbeddedScript = (id: string, sourceBase64: string): Promise<void> =>
     el.async = false;
     el.defer = false;
     el.dataset.rumEmbed = id;
+    el.dataset.rumBootstrapVersion = LOCAL_RUM_BOOTSTRAP_VERSION;
+    el.dataset.rumVendorVersion = upstreamVersion;
+    el.dataset.rumVendorSource = SPLUNK_VENDOR_SOURCE;
+    el.dataset.rumVendoredAt = SPLUNK_VENDOR_FETCHED_AT;
     el.text = decodeBase64(sourceBase64);
     el.onload = () => resolve();
     el.onerror = (err) => reject(err);
@@ -118,7 +131,7 @@ export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void
   if (rumInitialized) return;
   rumInitialized = true;
 
-  await loadEmbeddedScript("splunk-rum", SPLUNK_RUM_SCRIPT_BASE64);
+  await loadEmbeddedScript("splunk-rum", SPLUNK_RUM_SCRIPT_BASE64, SPLUNK_RUM_VENDOR_VERSION);
 
   if (!window.SplunkRum?.init) {
     console.warn("[Splunk RUM] init() not found. Check script URL.");
@@ -143,7 +156,11 @@ let replayInitialized = false;
 
 const loadReplayScript = async (): Promise<void> => {
   if (replayScriptLoaded) return;
-  await loadEmbeddedScript("splunk-session-replay", SPLUNK_SESSION_REPLAY_SCRIPT_BASE64);
+  await loadEmbeddedScript(
+    "splunk-session-replay",
+    SPLUNK_SESSION_REPLAY_SCRIPT_BASE64,
+    SPLUNK_SESSION_REPLAY_VENDOR_VERSION
+  );
   replayScriptLoaded = true;
 };
 

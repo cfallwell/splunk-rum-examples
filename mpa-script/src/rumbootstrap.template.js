@@ -1,4 +1,9 @@
 (() => {
+  const LOCAL_RUM_BOOTSTRAP_VERSION = "__LOCAL_RUM_BOOTSTRAP_VERSION__";
+  const SPLUNK_RUM_VENDOR_VERSION = "__SPLUNK_RUM_VENDOR_VERSION__";
+  const SPLUNK_SESSION_REPLAY_VENDOR_VERSION = "__SPLUNK_SESSION_REPLAY_VENDOR_VERSION__";
+  const SPLUNK_VENDOR_SOURCE = "__SPLUNK_VENDOR_SOURCE__";
+  const SPLUNK_VENDOR_FETCHED_AT = "__SPLUNK_VENDOR_FETCHED_AT__";
   const SPLUNK_RUM_SCRIPT_BASE64 = "__SPLUNK_RUM_SCRIPT_BASE64__";
   const SPLUNK_SESSION_REPLAY_SCRIPT_BASE64 = "__SPLUNK_SESSION_REPLAY_SCRIPT_BASE64__";
 
@@ -55,7 +60,7 @@
     }
   };
 
-  const loadEmbeddedScript = (id, sourceBase64) =>
+  const loadEmbeddedScript = (id, sourceBase64, upstreamVersion) =>
     new Promise((resolve, reject) => {
       if (document.querySelector(`script[data-rum-embed="${id}"]`)) {
         resolve();
@@ -66,6 +71,10 @@
       s.async = false;
       s.defer = false;
       s.dataset.rumEmbed = id;
+      s.dataset.rumBootstrapVersion = LOCAL_RUM_BOOTSTRAP_VERSION;
+      s.dataset.rumVendorVersion = upstreamVersion;
+      s.dataset.rumVendorSource = SPLUNK_VENDOR_SOURCE;
+      s.dataset.rumVendoredAt = SPLUNK_VENDOR_FETCHED_AT;
       s.text = decodeBase64(sourceBase64);
       s.onerror = (err) => {
         console.error("[Splunk Loader] Failed to load embedded script", id, err);
@@ -81,7 +90,7 @@
     if (rumInitialized) return;
     rumInitialized = true;
 
-    await loadEmbeddedScript("splunk-rum", SPLUNK_RUM_SCRIPT_BASE64);
+    await loadEmbeddedScript("splunk-rum", SPLUNK_RUM_SCRIPT_BASE64, SPLUNK_RUM_VENDOR_VERSION);
 
     if (window.SplunkRum && typeof window.SplunkRum.init === "function") {
       window.SplunkRum.init(RUM_INIT_OPTIONS);
@@ -95,7 +104,11 @@
 
   const loadSessionRecorderScript = async () => {
     if (recorderScriptLoaded) return;
-    await loadEmbeddedScript("splunk-session-replay", SPLUNK_SESSION_REPLAY_SCRIPT_BASE64);
+    await loadEmbeddedScript(
+      "splunk-session-replay",
+      SPLUNK_SESSION_REPLAY_SCRIPT_BASE64,
+      SPLUNK_SESSION_REPLAY_VENDOR_VERSION
+    );
     recorderScriptLoaded = true;
   };
 
