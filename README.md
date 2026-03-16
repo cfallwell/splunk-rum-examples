@@ -103,6 +103,7 @@ Package-specific build and publish steps live in [`spa-npm/README.md`](./spa-npm
 - Demo app setup and local testing: [`spa-demo/README.md`](./spa-demo/README.md)
 - Standalone hosted bootstrap source: [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js)
 - App-team local embed example: [`mpa-embed/rumbootstrap.js`](./mpa-embed/rumbootstrap.js)
+- Example Jenkins Artifactory publish job for the shared SignalFx release files: [`jenkins/Jenkinsfile.mpa-signalfx-artifactory`](./jenkins/Jenkinsfile.mpa-signalfx-artifactory)
 
 ## Optional Recorder Settings
 

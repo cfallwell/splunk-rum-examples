@@ -14,6 +14,12 @@ This example expects available versions to be listed from an internal object sto
 
 `https://artifactory.company.com/signalfx/rum-scripts/releases/`
 
+The matching platform-side publish example lives in:
+
+- [`mpa-script`](../mpa-script)
+- [`scripts/stage-mpa-signalfx-release.mjs`](../scripts/stage-mpa-signalfx-release.mjs)
+- [`jenkins/Jenkinsfile.mpa-signalfx-artifactory`](../jenkins/Jenkinsfile.mpa-signalfx-artifactory)
+
 From the repo root:
 
 ```bash
