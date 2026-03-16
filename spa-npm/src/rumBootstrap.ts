@@ -1,12 +1,11 @@
 import {
   LOCAL_RUM_BOOTSTRAP_VERSION,
-  SPLUNK_RUM_SCRIPT_BASE64,
-  SPLUNK_RUM_VENDOR_VERSION,
-  SPLUNK_SESSION_REPLAY_SCRIPT_BASE64,
-  SPLUNK_SESSION_REPLAY_VENDOR_VERSION,
-  SPLUNK_VENDOR_FETCHED_AT,
-  SPLUNK_VENDOR_SOURCE,
-} from "./vendor/embeddedSources";
+  SIGNALFX_FETCHED_AT,
+  SIGNALFX_RELEASE,
+  SIGNALFX_RUM_SCRIPT_BASE64,
+  SIGNALFX_SESSION_REPLAY_SCRIPT_BASE64,
+  SIGNALFX_SOURCE,
+} from "./signalfx/embeddedSources";
 
 // src/rumBootstrap.ts
 export interface RumConfig {
@@ -70,9 +69,9 @@ const loadEmbeddedScript = (
     el.defer = false;
     el.dataset.rumEmbed = id;
     el.dataset.rumBootstrapVersion = LOCAL_RUM_BOOTSTRAP_VERSION;
-    el.dataset.rumVendorVersion = upstreamVersion;
-    el.dataset.rumVendorSource = SPLUNK_VENDOR_SOURCE;
-    el.dataset.rumVendoredAt = SPLUNK_VENDOR_FETCHED_AT;
+    el.dataset.rumSignalfxRelease = upstreamVersion;
+    el.dataset.rumSignalfxSource = SIGNALFX_SOURCE;
+    el.dataset.rumSignalfxFetchedAt = SIGNALFX_FETCHED_AT;
     el.text = decodeBase64(sourceBase64);
     el.onload = () => resolve();
     el.onerror = (err) => reject(err);
@@ -131,7 +130,7 @@ export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void
   if (rumInitialized) return;
   rumInitialized = true;
 
-  await loadEmbeddedScript("splunk-rum", SPLUNK_RUM_SCRIPT_BASE64, SPLUNK_RUM_VENDOR_VERSION);
+  await loadEmbeddedScript("splunk-rum", SIGNALFX_RUM_SCRIPT_BASE64, SIGNALFX_RELEASE);
 
   if (!window.SplunkRum?.init) {
     console.warn("[Splunk RUM] init() not found. Check script URL.");
@@ -158,8 +157,8 @@ const loadReplayScript = async (): Promise<void> => {
   if (replayScriptLoaded) return;
   await loadEmbeddedScript(
     "splunk-session-replay",
-    SPLUNK_SESSION_REPLAY_SCRIPT_BASE64,
-    SPLUNK_SESSION_REPLAY_VENDOR_VERSION
+    SIGNALFX_SESSION_REPLAY_SCRIPT_BASE64,
+    SIGNALFX_RELEASE
   );
   replayScriptLoaded = true;
 };

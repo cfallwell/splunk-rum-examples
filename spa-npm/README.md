@@ -61,16 +61,15 @@ Legacy params like `godmode`, `canvas`, or `assets` are not supported.
 
 ## Vendored SDK source
 
-The package vendors the minified Splunk browser SDK files into `spa-npm/src/vendor/` and embeds them locally when the bootstrap initializes. This avoids runtime CDN fetches while keeping the source artifacts in-repo.
+The package stores the minified Splunk browser SDK files in `spa-npm/src/signalfx/` and embeds them locally when the bootstrap initializes. This avoids runtime CDN fetches while keeping the source artifacts in-repo.
 
 The generated embedded script tags include:
 
 - `data-rum-bootstrap-version` for the local bootstrap version
-- `data-rum-vendor-version` for the vendored upstream SDK version
-- `data-rum-vendor-source` and `data-rum-vendored-at` for traceability
+- `data-rum-signalfx-release` for the embedded upstream SignalFx release
+- `data-rum-signalfx-source` and `data-rum-signalfx-fetched-at` for traceability
 
-To refresh the vendored SDK:
+To refresh the SignalFx SDK:
 
-- Replace the minified files in `spa-npm/src/vendor/`.
-- Run `node ../scripts/generate-rum-embeds.mjs`.
+- Run `node ../scripts/update-signalfx-scripts.mjs <release>`.
 - Rebuild the package with `npm run build`.
