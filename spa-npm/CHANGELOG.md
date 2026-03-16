@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.0
+
+- Removed the `godmode` URL override from both bootstrap flows.
+- Stored the minified Splunk RUM browser SDK and session recorder in `src/signalfx`.
+- Embedded the local SignalFx scripts so neither bootstrap fetches the SDK from the CDN at runtime.
+
 ## 4.0.0
 
 - Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (`async = false`, `defer = false`).

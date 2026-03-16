@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.1](https://github.com/cfallwell/splunk-rum-examples/compare/v3.0.0...v3.0.1) (2026-03-13)
+
+
+### Bug Fixes
+
+* load rum scripts synchronously ([091256c](https://github.com/cfallwell/splunk-rum-examples/commit/091256c020adf4694fd95db530f4821c1e45c390))
+* repair rumbootstrap 4.0.0 release metadata ([aee63bc](https://github.com/cfallwell/splunk-rum-examples/commit/aee63bcec4479b7cc7a35d8e1b253778caacbe92))
+
 ## [3.0.0](https://github.com/cfallwell/splunk-rum-examples/compare/v2.0.0...v3.0.0) (2026-02-26)
 
 

@@ -7,9 +7,9 @@ TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 Latest release notes live in `CHANGELOG.md`.
 
 <!-- release:auto:start -->
-- Current version: `v4.0.0`
-- Latest update: Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (async = false, defer = false).
-- Additional updates: 0 (see `CHANGELOG.md`)
+- Current version: `v5.0.0`
+- Latest update: Removed the godmode URL override from both bootstrap flows.
+- Additional updates: 2 (see `CHANGELOG.md`)
 <!-- release:auto:end -->
 
 ## Build
@@ -53,23 +53,24 @@ The library ships with a minimal default config so it can bootstrap without app 
 
 ## URL parameters
 
-Only the following URL params are supported for enabling Session Replay:
+Only the following URL param is supported for enabling Session Replay:
 
 - `replay=on|true`
-- `godmode=on|true` (enables all features and sets `maskAllInputs=false` and `maskAllText=false`)
 
-Legacy params like `canvas` or `assets` are not supported.
+Legacy params like `godmode`, `canvas`, or `assets` are not supported.
 
-## Version pinning
+## Local SignalFx SDK source
 
-This build pins both RUM and Session Recorder to v1.1.0 to avoid version mismatch with `latest`.
+The package stores the minified Splunk browser SDK files in `spa-npm/src/signalfx/` and embeds them locally when the bootstrap initializes. This avoids runtime CDN fetches while keeping the source artifacts in-repo.
 
-Where it is set:
+The generated embedded script tags include:
 
-- `spa-npm/src/rumBootstrap.ts` (`RUM_VERSION` constant).
+- `data-rum-bootstrap-version` for the local bootstrap version
+- `data-rum-signalfx-release` for the embedded upstream SignalFx release
+- `data-rum-signalfx-source` and `data-rum-signalfx-fetched-at` for traceability
 
-How to manage it:
+To refresh the SignalFx SDK:
 
-- Update `RUM_VERSION` to the desired Splunk release.
-- Ensure both CDN URLs (RUM + Session Recorder) still reference the same version.
-- Rebuild the package (`npm run build`) and publish a new version.
+- Run `node ../scripts/update-signalfx-scripts.mjs` and choose a published release from the numbered list.
+- If you already know the exact release, run `node ../scripts/update-signalfx-scripts.mjs v2.3.0`.
+- Rebuild the package with `npm run build`.

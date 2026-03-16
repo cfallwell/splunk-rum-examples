@@ -28,6 +28,25 @@ The goal is to let a platform team host, version, and roll out RUM internally wi
 6. Version and roll out deliberately.
    Pin a versioned script or package, test in staging, then promote per app or per environment through your normal release pipeline.
 
+## Replay Controls
+
+Only one URL toggle is supported across the MPA bootstrap and SPA package:
+
+- `replay=on|true` enables Session Replay.
+
+Legacy URL params like `godmode`, `canvas`, or `assets` are not supported.
+
+Example:
+
+<https://app.company.com/?replay=on>
+
+## Deployment Overview
+
+- Choose MPA or SPA integration.
+- Configure Splunk RUM settings such as realm, access token, app name, and environment in the hosted script or package config.
+- The repo stores the minified SignalFx browser SDK files in `src/signalfx` and embeds them locally, so the bootstrap does not fetch the SDK from the CDN at runtime.
+- Deploy with your normal release pipeline so the bootstrap or package is versioned and cacheable.
+
 ## Recommended Internal Distribution Model
 
 ### Option 1: Centrally hosted browser bootstrap
@@ -68,18 +87,6 @@ function App() {
 ```
 
 Package-specific build and publish steps live in [`spa-npm/README.md`](./spa-npm/README.md).
-
-## Replay Enablement
-
-The shared behavior across both integration styles is intentionally small:
-
-- `replay=on|true` enables Session Replay.
-- The bootstrap persists replay enablement in `sessionStorage` for the current tab session.
-- A new tab or browser window starts with replay off again.
-
-Example:
-
-<https://app.company.com/?replay=on>
 
 ## Internal Rollout Checklist
 
