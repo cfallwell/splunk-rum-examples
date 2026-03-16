@@ -1,8 +1,8 @@
-name: Publish spa-npm to GitHub Packages
+name: Publish Release
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
   workflow_dispatch: {}
 
 permissions:
@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   publish:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,7 +18,29 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Resolve release metadata
+        id: release
+        run: |
+          VERSION=$(node -p "require('./spa-npm/package.json').version")
+          TAG="v${VERSION}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Check for existing release
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release ${TAG} already exists; skipping publish."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node
+        if: steps.existing.outputs.exists != 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "18"
@@ -28,21 +49,48 @@ jobs:
           cache: "npm"
           cache-dependency-path: "spa-npm/package.json"
 
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Install dependencies
+        if: steps.existing.outputs.exists != 'true'
         working-directory: spa-npm
         run: npm install
 
       - name: Build
+        if: steps.existing.outputs.exists != 'true'
         working-directory: spa-npm
         run: npm run build
 
+      - name: Extract release notes
+        if: steps.existing.outputs.exists != 'true'
+        run: |
+          node scripts/extract-changelog-section.mjs \
+            spa-npm/CHANGELOG.md \
+            "${{ steps.release.outputs.version }}" \
+            dist/release-notes.md
+
       - name: Publish
+        if: steps.existing.outputs.exists != 'true'
         working-directory: spa-npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm publish --access public
+
+      - name: Build MPA assets
+        if: steps.existing.outputs.exists != 'true'
+        run: |
+          mkdir -p dist/mpa
+          cp mpa-script/rumbootstrap.js dist/mpa/rumbootstrap.js
+          npx --yes terser mpa-script/rumbootstrap.js \
+            --compress --mangle \
+            --output dist/mpa/rumbootstrap.min.js
+
+      - name: Create GitHub release
+        if: steps.existing.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes-file dist/release-notes.md \
+            dist/mpa/rumbootstrap.js \
+            dist/mpa/rumbootstrap.min.js
