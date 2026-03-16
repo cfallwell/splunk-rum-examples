@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.3](https://github.com/cfallwell/splunk-rum-examples/compare/v3.0.2...v3.0.3) (2026-03-16)
+
+
+### Bug Fixes
+
+* include full package release notes in readme ([4432efd](https://github.com/cfallwell/splunk-rum-examples/commit/4432efd1003231c5d82a617969d8f81c4f6d960f))
+* include full package release notes in readme ([e7c1b1d](https://github.com/cfallwell/splunk-rum-examples/commit/e7c1b1dd7f53064f14bffa149e3776c2d1548482))
+
 ## [3.0.2](https://github.com/cfallwell/splunk-rum-examples/compare/v3.0.1...v3.0.2) (2026-03-16)
 
 
