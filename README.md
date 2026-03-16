@@ -20,13 +20,13 @@ The goal is to let a platform team host, version, and roll out RUM internally wi
 2. Set your Splunk values.
    Update `realm`, `rumAccessToken`, `applicationName`, and environment settings in the hosted script or the SPA package config override.
 3. Publish internally.
-   Host the browser bootstrap on your internal CDN or artifact store, and publish the SPA package to your internal npm registry if you support React consumers.
+   Host the browser bootstrap on your internal CDN or artifact store, and publish the SPA package to your internal npm registry if you support React consumers. In this repo, both are published from the same GitHub Actions release workflow using the version in `spa-npm/package.json`.
 4. Wire it into apps.
    For MPAs, inject the hosted script from your edge, ingress, shared layout, or tag manager. For SPAs, install the package and initialize it near the app root.
 5. Validate replay enablement.
    Start a session with `?replay=on` or `?replay=true` and confirm the session is captured. Replay enablement is persisted only for the current browser tab session.
 6. Version and roll out deliberately.
-   Pin a versioned script or package, test in staging, then promote per app or per environment through your normal release pipeline.
+   Pin a versioned script or package, test in staging, then promote per app or per environment through your normal release pipeline. The intended source of truth is the version in `spa-npm/package.json`.
 
 ## Replay Controls
 

@@ -7,9 +7,16 @@ TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 Latest release notes live in `CHANGELOG.md`.
 
 <!-- release:auto:start -->
-- Current version: `v5.0.0`
-- Latest update: Removed the godmode URL override from both bootstrap flows.
-- Additional updates: 2 (see `CHANGELOG.md`)
+- Current version: `v1.0.0`
+- Latest update: Reset the release line so GitHub Releases, the npm package, and the MPA bootstrap all publish under the same version.
+- Additional updates: 4 (see `CHANGELOG.md`)
+
+Release notes for this version:
+- Reset the release line so GitHub Releases, the npm package, and the MPA bootstrap all publish under the same version.
+- Replaced the split release automation with a single workflow that reads spa-npm/package.json, publishes the npm package, and creates the matching GitHub release with the MPA assets attached.
+- Added a release-notes extraction step so the GitHub Release body and the package README can show the full set of notes for the shipped version.
+- Added a helper script to set the release version in one place and regenerate the embedded/bootstrap artifacts from that same value.
+- Embedded the local SignalFx RUM and session-recorder bundles for the MPA bootstrap flow and tracked their upstream release metadata.
 <!-- release:auto:end -->
 
 ## Build
@@ -26,18 +33,29 @@ Notes:
 
 ## Publish
 
-From `spa-npm/`:
+The repo now uses `spa-npm/package.json` as the single source of truth for release versions.
+
+Recommended flow from the repo root:
 
 ```bash
-npm login
-npm run build
-npm version patch # or minor/major
-npm publish
+npm run release:set-version -- 1.0.0
+git add .
+git commit -m "feat: prepare v1.0.0 release"
+git push
 ```
 
-Optional checks before publish:
+After that PR merges to `main`, GitHub Actions will:
+
+- publish `@cfallwell/rumbootstrap` to GitHub Packages
+- create the matching GitHub Release tag `vX.Y.Z`
+- upload `rumbootstrap.js` and `rumbootstrap.min.js` as MPA assets
+
+Release notes come from the matching section in `CHANGELOG.md`.
+
+Optional checks before opening the PR:
 
 ```bash
+npm run build
 npm pack
 ```
 

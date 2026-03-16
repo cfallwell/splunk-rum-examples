@@ -1,7 +1,7 @@
 {
   "name": "@cfallwell/rumbootstrap",
-  "version": "3.0.2",
-  "description": "v4.0.0: Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (async = false, defer = false).",
+  "version": "1.0.0",
+  "description": "v1.0.0: Reset the release line so GitHub Releases, the npm package, and the MPA bootstrap all publish under the same version. (+4 more updates in CHANGELOG.md)",
   "changelog": "CHANGELOG.md",
   "type": "module",
   "main": "./dist/index.js",
@@ -29,6 +29,7 @@
     "prebuild": "node ../scripts/generate-rum-embeds.mjs && npm run sync:description",
     "build": "tsc -p tsconfig.json",
     "signalfx:update": "node ../scripts/update-signalfx-scripts.mjs",
+    "release:set-version": "node ../scripts/set-release-version.mjs",
     "version": "npm run sync:description",
     "prepare": "npm run build"
   },

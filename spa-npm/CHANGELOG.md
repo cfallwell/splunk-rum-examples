@@ -1,47 +1,9 @@
 # Changelog
 
-## 5.0.0
+## 1.0.0
 
-- Removed the `godmode` URL override from both bootstrap flows.
-- Stored the minified Splunk RUM browser SDK and session recorder in `src/signalfx`.
-- Embedded the local SignalFx scripts so neither bootstrap fetches the SDK from the CDN at runtime.
-
-## 4.0.0
-
-- Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (`async = false`, `defer = false`).
-## Unreleased
-
-- No unreleased changes.
-
-## 2.1.2
-
-- Updated the package README shown on GitHub Packages to include auto-synced current version and latest update details.
-- Extended metadata sync automation so both `package.json` description and README release summary are refreshed from changelog entries.
-
-## 2.1.1
-
-- Added automatic package metadata sync so the npm description always includes the current version and latest changelog summary.
-- Updated package description generation to include the current version and latest update summary with a changelog pointer.
-
-## 2.1.0
-
-- Fixed intermittent Session Replay ingest failures caused by recorder initialization with placeholder realm/token values.
-- Added a replay credential guard to skip recorder init until real `realm` and `rumAccessToken` are available.
-- Ensured runtime config updates always refresh the active replay credentials before replay init.
-
-## 2.0.0
-
-## URL parameters (breaking change)
-
-Only the following URL params are supported for enabling Session Replay:
-
-- `replay=on|true`
-- `godmode=on|true` (enables all features and sets `maskAllInputs=false` and `maskAllText=false`)
-
-Legacy params like `canvas` or `assets` are no longer supported.
-This change is a breaking update for any existing replay URLs.
-
-## 1.1.2
-- Stabilized SPA + MPA session replay bootstrap flows.
-- Ensured replay enablement via URL flag (`replay=on|true`) persists for the session.
-- Kept masking defaults (`maskAllInputs`, `maskAllText`) and sensitivity rules configurable via bootstrap config.
+- Reset the release line so GitHub Releases, the npm package, and the MPA bootstrap all publish under the same version.
+- Replaced the split release automation with a single workflow that reads `spa-npm/package.json`, publishes the npm package, and creates the matching GitHub release with the MPA assets attached.
+- Added a release-notes extraction step so the GitHub Release body and the package README can show the full set of notes for the shipped version.
+- Added a helper script to set the release version in one place and regenerate the embedded/bootstrap artifacts from that same value.
+- Embedded the local SignalFx RUM and session-recorder bundles for the MPA bootstrap flow and tracked their upstream release metadata.

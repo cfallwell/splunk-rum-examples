@@ -1,5 +1,5 @@
 (() => {
-  const LOCAL_RUM_BOOTSTRAP_VERSION = "5.0.0";
+  const LOCAL_RUM_BOOTSTRAP_VERSION = "1.0.0";
   const SIGNALFX_RELEASE = "v2.3.0";
   const SIGNALFX_SOURCE = "https://cdn.signalfx.com/o11y-gdi-rum/v2.3.0";
   const SIGNALFX_FETCHED_AT = "2026-03-16";
