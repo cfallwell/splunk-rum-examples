@@ -75,11 +75,17 @@ if (packageJson.description !== description) {
 }
 
 if (fs.existsSync(readmePath)) {
+  const releaseDetailLines = summarySource.map((line) =>
+    line.startsWith("- ") ? line : `- ${line}`
+  );
   const releaseBlock = [
     "<!-- release:auto:start -->",
     `- Current version: \`v${version}\``,
     `- Latest update: ${primary}`,
     `- Additional updates: ${extraCount} (see \`CHANGELOG.md\`)`,
+    "",
+    "Release notes for this version:",
+    ...releaseDetailLines,
     "<!-- release:auto:end -->",
   ].join("\n");
 
