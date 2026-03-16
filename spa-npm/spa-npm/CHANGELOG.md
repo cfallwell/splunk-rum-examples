@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/cfallwell/splunk-rum-examples/compare/v3.0.1...v3.0.2) (2026-03-16)
+
+
+### Bug Fixes
+
+* avoid failing builds on changelog drift ([1626737](https://github.com/cfallwell/splunk-rum-examples/commit/1626737be5968c8dc78ae7ea2b32776f98a547e0))
+
 ## [3.0.1](https://github.com/cfallwell/splunk-rum-examples/compare/v3.0.0...v3.0.1) (2026-03-13)
 
 
