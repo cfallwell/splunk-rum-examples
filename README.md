@@ -12,11 +12,11 @@ This repo contains an NPM package for SPA apps, and Splunk RUM examples for both
 
 ## Recorder parameters
 
-URL-parameter editable (MPA + SPA) — only the options below are supported:
+URL-parameter editable (MPA + SPA) — only the option below is supported:
 
 - `replay=on|true` enables the recorder for the session.
-- `godmode=on|true` enables all features and sets `maskAllInputs=false` and `maskAllText=false`.
-  - Breaking change: legacy URL params like `canvas` or `assets` are no longer supported.
+
+Legacy URL params like `godmode`, `canvas`, or `assets` are not supported.
 
 Not editable via URL (set in config for security and consistency):
 
@@ -25,11 +25,9 @@ Not editable via URL (set in config for security and consistency):
 - `maxExportIntervalMs` (number, default `5000`)
 - `sensitivityRules` (array of rule objects)
 
-Note: `godmode=on|true` overrides masking defaults for debugging.
-
 Example:
 
-<https://app.company.com/?replay=on&godmode=on>
+<https://app.company.com/?replay=on>
 
 Turn on full-text and input capture (this configuration should be made in the bootstraps):
 
@@ -61,6 +59,8 @@ For additional configuration options, see the Splunk documentation:
 
 - Choose MPA or SPA integration.
 - Configure Splunk RUM settings (realm, access token, app name, environment) in the script/package.
+- The repo stores the minified Splunk browser SDK in `src/signalfx` and embeds it locally at runtime, so the bootstrapper does not fetch the SDK from the CDN.
+- The embedded `<script>` tags are stamped with bootstrap and upstream SignalFx release metadata via `data-rum-bootstrap-version` and `data-rum-signalfx-release`.
 - Deploy with your normal release pipeline so the bootstrapper is versioned and cacheable.
 
 ## Common URL controls (MPA + SPA)

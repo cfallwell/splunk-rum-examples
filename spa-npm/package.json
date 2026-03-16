@@ -26,8 +26,9 @@
   "scripts": {
     "clean": "rm -rf dist",
     "sync:description": "node scripts/sync-package-description.mjs",
-    "prebuild": "npm run sync:description",
+    "prebuild": "node ../scripts/generate-rum-embeds.mjs && npm run sync:description",
     "build": "tsc -p tsconfig.json",
+    "signalfx:update": "node ../scripts/update-signalfx-scripts.mjs",
     "version": "npm run sync:description",
     "prepare": "npm run build"
   },

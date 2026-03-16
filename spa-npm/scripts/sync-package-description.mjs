@@ -28,7 +28,10 @@ const startIndex = lines.findIndex((line) => {
 });
 
 if (startIndex < 0) {
-  throw new Error(`No changelog heading found for version ${version}.`);
+  console.warn(
+    `[sync-package-description] No changelog heading found for version ${version}; leaving package metadata unchanged.`
+  );
+  process.exit(0);
 }
 
 const sectionLines = [];
@@ -45,7 +48,10 @@ const bulletLines = sectionLines
 
 const summarySource = bulletLines.length > 0 ? bulletLines : sectionLines;
 if (summarySource.length === 0) {
-  throw new Error(`No release notes found for version ${version} in changelog.`);
+  console.warn(
+    `[sync-package-description] No release notes found for version ${version}; leaving package metadata unchanged.`
+  );
+  process.exit(0);
 }
 
 const primary = summarySource[0].replace(/\s+/g, " ").trim();
