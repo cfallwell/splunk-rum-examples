@@ -1,42 +1,125 @@
 # splunk-rum-examples
 
-This repo contains an NPM package for SPA apps, and Splunk RUM examples for both multi-page apps (MPA) and single-page apps (SPA) that enable on-demand session recording via url parameters.
+This repo shows two ways to deliver Splunk RUM and on-demand Session Replay from a centrally managed platform workflow:
 
-## Goals
+- Host a shared browser bootstrap for classic multi-page apps and no-code edge injection.
+- Publish a shared SPA package for React apps that need router-aware tracking.
 
-- Provide a single shared JS entry point for RUM + Session Recorder.
-- Enable Session Recorder on demand per session with a simple URL parameter.
-  - `?Replay=on` or `?Replay=true` enables recorder and persists for the current browser session.
-- Avoid requiring application teams for deployment changes.
-- Work for both SPAs and MPAs (React-specific hooks are optional).
+The goal is to let a platform team host, version, and roll out RUM internally without forcing every product team to build its own bootstrap.
 
-## Recorder parameters
+## What to use
 
-URL-parameter editable (MPA + SPA) — only the option below is supported:
+- [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js): standalone browser bootstrap for MPAs and simple SPAs.
+- [`spa-npm/README.md`](./spa-npm/README.md): React SPA package, build, publish, and package-usage instructions.
+- [`spa-demo/README.md`](./spa-demo/README.md): local demo app showing the SPA package in use.
 
-- `replay=on|true` enables the recorder for the session.
+## Internal Hosting Quick Start
+
+1. Choose your delivery model.
+   Use the MPA bootstrap when you want central hosting and injection with little or no app-code change. Use the SPA package when app teams need router-aware tracking inside React.
+2. Set your Splunk values.
+   Update `realm`, `rumAccessToken`, `applicationName`, and environment settings in the hosted script or the SPA package config override.
+3. Publish internally.
+   Host the browser bootstrap on your internal CDN or artifact store, and publish the SPA package to your internal npm registry if you support React consumers.
+4. Wire it into apps.
+   For MPAs, inject the hosted script from your edge, ingress, shared layout, or tag manager. For SPAs, install the package and initialize it near the app root.
+5. Validate replay enablement.
+   Start a session with `?replay=on` or `?replay=true` and confirm the session is captured. Replay enablement is persisted only for the current browser tab session.
+6. Version and roll out deliberately.
+   Pin a versioned script or package, test in staging, then promote per app or per environment through your normal release pipeline.
+
+## Replay Controls
+
+Only one URL toggle is supported across the MPA bootstrap and SPA package:
+
+- `replay=on|true` enables Session Replay.
 
 Legacy URL params like `godmode`, `canvas`, or `assets` are not supported.
-
-Not editable via URL (set in config for security and consistency):
-
-- `maskAllInputs` (boolean, default `true`)
-- `maskAllText` (boolean, default `true`)
-- `maxExportIntervalMs` (number, default `5000`)
-- `sensitivityRules` (array of rule objects)
 
 Example:
 
 <https://app.company.com/?replay=on>
 
-Turn on full-text and input capture (this configuration should be made in the bootstraps):
+## Deployment Overview
+
+- Choose MPA or SPA integration.
+- Configure Splunk RUM settings such as realm, access token, app name, and environment in the hosted script or package config.
+- The repo stores the minified SignalFx browser SDK files in `src/signalfx` and embeds them locally, so the bootstrap does not fetch the SDK from the CDN at runtime.
+- Deploy with your normal release pipeline so the bootstrap or package is versioned and cacheable.
+
+## Recommended Internal Distribution Model
+
+### Option 1: Centrally hosted browser bootstrap
+
+Use this when the platform team wants the fastest rollout path for many apps.
+
+- Keep a versioned copy of [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js) in an internal repo or release pipeline.
+- Publish it to an internal CDN or object store.
+- Inject it into HTML responses from the edge or shared layout.
+- Let product teams opt into replay by opening the app with `?replay=on`.
+
+Example script tag:
+
+```html
+<script src="https://cdn.internal.company.com/rum-bootstrap/0.1.0/rumBootstrap.min.js"></script>
+```
+
+### Option 2: Internal SPA package
+
+Use this when React apps need route tracking and typed integration points.
+
+- Build and publish the package from [`spa-npm`](./spa-npm).
+- Ask app teams to install it from your internal package registry.
+- Initialize it once near the app root and include router tracking where needed.
+
+Minimal example:
+
+```tsx
+import { SplunkRumProvider, RumRouterTracker } from "@yourcompany/rumbootstrap";
+
+function App() {
+  return (
+    <SplunkRumProvider configOverride={rumConfig}>
+      <RumRouterTracker />
+    </SplunkRumProvider>
+  );
+}
+```
+
+Package-specific build and publish steps live in [`spa-npm/README.md`](./spa-npm/README.md).
+
+## Internal Rollout Checklist
+
+- Decide whether each app uses the hosted bootstrap or the SPA package.
+- Pin one internal version per environment or per host.
+- Keep tokens and environment-specific values under platform-team control.
+- Validate masking behavior and replay quality in staging.
+- Roll forward and back by updating the injected script or published package version, not by editing app code.
+
+## Further Instructions
+
+- SPA package build, publish, and usage: [`spa-npm/README.md`](./spa-npm/README.md)
+- Demo app setup and local testing: [`spa-demo/README.md`](./spa-demo/README.md)
+- Standalone hosted bootstrap source: [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js)
+
+## Optional Recorder Settings
+
+Set these in the hosted script or package config, not from URL parameters:
+
+- `maskAllInputs` defaults to `true`
+- `maskAllText` defaults to `true`
+- `maxExportIntervalMs` defaults to `5000`
+- `sensitivityRules` defaults to an empty array
+- `features.backgroundServiceSrc`, `features.canvas`, `features.video`, `features.iframes`, `features.packAssets`, and `features.cacheAssets` can be enabled per deployment
+
+Turn on full-text and input capture:
 
 ```js
 maskAllInputs: false,
 maskAllText: false,
 ```
 
-Add fine-grained masking/exclusion:
+Add fine-grained masking or exclusions:
 
 ```js
 sensitivityRules: [
@@ -46,306 +129,45 @@ sensitivityRules: [
 ],
 ```
 
-For additional configuration options, see the Splunk documentation:
+For the full recorder option surface, see the Splunk Session Recorder docs:
 <https://github.com/signalfx/splunk-otel-js-web/blob/main/packages/session-recorder/README.md>
 
-## Contents
+## Deployment Scenarios
 
-- `mpa-script/rumbootstrap.js`: lightweight bootstrapper for classic multi-page sites. Can be used for SPA sites that do not need to capture routes
-- `spa-npm/`: reusable TypeScript package for SPA routing-aware tracking.
-- `spa-demo/`: Vite demo app showing the SPA package in a real React flow.
+### Edge or ingress injection with no app repo changes
 
-## Deployment overview
-
-- Choose MPA or SPA integration.
-- Configure Splunk RUM settings (realm, access token, app name, environment) in the script/package.
-- The repo stores the minified Splunk browser SDK in `src/signalfx` and embeds it locally at runtime, so the bootstrapper does not fetch the SDK from the CDN.
-- The embedded `<script>` tags are stamped with bootstrap and upstream SignalFx release metadata via `data-rum-bootstrap-version` and `data-rum-signalfx-release`.
-- Deploy with your normal release pipeline so the bootstrapper is versioned and cacheable.
-
-## Common URL controls (MPA + SPA)
-
-Both the MPA script and the SPA package support the same URL parameter for enabling replay. See the Recorder parameters section for the example URL.
-
-## Recommendations
-
-- Load the bootstrapper early so it can capture the full session once recording is enabled.
-- Use feature flags or runtime config to control when recording starts.
-- In SPAs, hook routing events so navigation changes are reflected in session recordings.
-- Validate in staging to confirm ingestion and playback quality.
-
-## MPA bootstrap: overview
-
-### Behavior
-
-- Included from HTML (for example `index.html`).
-- Always loads and initializes Splunk RUM.
-- Conditionally loads and initializes Session Recorder when requested.
-
-### Responsibilities
-
-- RUM initialization:
-  - Dynamically loads the RUM bundle.
-  - Calls `SplunkRum.init` with app options (realm, access token, app name, environment).
-- Configuration management:
-  - Exposes a configuration object with required fields and common options.
-  - Loads the Session Recorder script and calls `SplunkSessionRecorder.init` when enabled.
-- Replay enablement:
-  - Reads `Replay`/`replay` query params.
-  - Persists enablement using `sessionStorage` key `splunk-session-replay-enabled`.
-- Optional SPA hooks:
-  - `window.enableReplayPersist()` to set the session flag and enable recorder.
-  - `window.enableReplayNow()` to enable recorder immediately without a session flag.
-
-## SPA and MPA usage without app code changes
-
-### SPAs (Single Page Apps)
-
-- Base `rumBootstrap.js` behavior works even without touching the SPA repo.
-- On initial load:
-  - Script is injected at the edge.
-  - RUM is initialized.
-  - `?Replay=on` sets `sessionStorage['splunk-session-replay-enabled'] = 'on'`.
-  - Session Recorder is enabled for that browser session.
-- SPA route changes do not require repo code changes as long as you can start with `?Replay=on`.
-- You can use the MPA script in SPAs, but it is a baseline bootstrap only:
-  - No router-aware tracking or SPA-specific helpers from the NPM package.
-  - Replay enablement is limited to the URL/session logic and the optional global hooks.
-  - No typed config override or React context helpers.
-
-Example flow:
-
-- `https://app.company.com/?Replay=on` → user navigates around → sessions are recorded.
-
-### MPAs (Multi-Page Apps)
-
-Every HTML page served by that host includes:
-
-```html
-<script src="https://cdn.company.com/rum-bootstrap/0.1.0/rumBootstrap.min.js"></script>
-```
-
-If the user starts with `?Replay=on`:
-
-- `sessionStorage` flag is set for that tab.
-- Every subsequent page load in the same tab will re-enable Session Recorder.
-- No app code involved, just platform-side injection.
-
-Caveats:
-
-- New tab/window is a new session (no `sessionStorage`).
-
-## SPA integration examples
-
-### Install and initialize in a SPA and capture Route changes as events
-
-Recommend hosting the NPM package example in this repo in your company's package repository and calling it (for SPA apps that require route change awareness).  See github workflow for example.
-
-```bash
-npm install @{yourcompany}/rumbootstrap
-```
-
-```tsx
-import { SplunkRumProvider, RumRouterTracker } from "@{yourcompany}/rumbootstrap";
-
-function App() {
-  return (
-    <SplunkRumProvider configOverride={rumConfig}>
-      <RumRouterTracker />
-      {/* your routes/components */}
-    </SplunkRumProvider>
-  );
-}
-```
-
-### React Router: auto-enable when `?Replay=on`
-
-```tsx
-// ReplayParamWatcher.tsx
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-
-export function ReplayParamWatcher() {
-  const { search } = useLocation();
-
-  useEffect(() => {
-    const params = new URLSearchParams(search);
-    const value = params.get("Replay") ?? params.get("replay");
-    if (!value) return;
-
-    const v = value.toLowerCase();
-    if (v === "on" || v === "true") {
-      // Persist for the rest of the session and enable now
-      window.enableReplayPersist?.();
-    }
-  }, [search]);
-
-  return null;
-}
-```
-
-In your app root:
-
-```tsx
-function App() {
-  return (
-    <>
-      <ReplayParamWatcher />
-      {/* your routes/components */}
-    </>
-  );
-}
-```
-
-### Vue Router: `afterEach` hook
-
-```js
-// router.js
-import { createRouter, createWebHistory } from "vue-router";
-
-const routes = [/* ... */];
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes
-});
-
-router.afterEach((to) => {
-  const replay = (to.query.Replay || to.query.replay || "").toString().toLowerCase();
-  if (replay === "on" || replay === "true") {
-    window.enableReplayPersist && window.enableReplayPersist();
-  }
-});
-
-export default router;
-```
-
-## Recommendations for Enterprise Hosting and Versioning
-
-### Repo and versioning (platform teams own the repos and code)
-
-- Create a dedicated repo, for example:
-  - `platform-rum-bootstrap/`
-  - `rumBootstrap.js`
-  - `package.json` (optional)
-  - `CHANGELOG.md`
-  - `README.md`
-- Maintain semantic versions; start with `0.1.0-beta`.
-- Tag releases in Git:
-
-```bash
-git tag -a v0.1.0-beta -m "Initial shared Splunk RUM + Session Recorder bootstrap"
-git push origin v0.1.0-beta
-```
-
-### Build and publish to Artifactory/CDN
-
-CI pipeline (owned by platform team):
-
-- On tag `vX.Y.Z`:
-  - Optionally run lint/tests.
-  - Optionally minify → `rumBootstrap.min.js`.
-  - Publish artifacts to Artifactory (or internal object store):
-    - `/rum-bootstrap/0.1.0-beta/rumBootstrap.js`
-    - `/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js`
-    - `/rum-bootstrap/latest/rumBootstrap.js` (optional)
-- Expose via CDN/edge URL, for example:
-  - `https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js`
-
-Platform team controls:
-
-- What version is published.
-- When a version is promoted from beta to stable.
-- What URL apps load from.
-
-## Edge/ingress script injection (no app repo changes)
-
-### NGINX/Envoy/Ingress filter pattern
-
-Inject the script tag before `</head>` or `</body>`:
+Inject the hosted bootstrap before `</head>` or `</body>`:
 
 ```html
 <script src="https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js"></script>
 ```
 
-Example (NGINX `sub_filter` style pseudo-config):
+Example NGINX pattern:
 
 ```nginx
-# Only for HTML responses
 sub_filter_types text/html;
 
-# Only for selected host/app
 server {
     server_name app1.company.com;
-
-    # ... upstream/proxy_pass config ...
 
     sub_filter '</head>' '<script src="https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js"></script></head>';
     sub_filter_once on;
 }
 ```
 
-Result: product teams do not touch HTML. Platform flips a config switch to enable RUM + Recorder per app.
+This is the simplest path when the platform team owns ingress or HTML injection.
 
-### Envoy filter example (Lua)
+### Shared layout, tag manager, or other central entrypoint
 
-```yaml
-http_filters:
-  - name: envoy.filters.http.lua
-    typed_config:
-      "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
-      inline_code: |
-        function envoy_on_response(response_handle)
-          local content_type = response_handle:headers():get("content-type") or ""
-          if string.find(content_type, "text/html") then
-            local body = response_handle:body()
-            if body:length() > 0 then
-              local script = '<script src="https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js"></script>'
-              local updated = string.gsub(body:getBytes(0, body:length()), "</head>", script .. "</head>")
-              body:setBytes(updated)
-            end
-          end
-        end
-```
+If edge injection is not available, use another centrally managed entrypoint:
 
-### F5 iRule example
+- Shared HTML layout or theme template
+- Tag manager such as GTM, Tealium, or Adobe Launch
+- Internal browser extension for controlled internal domains
 
-```tcl
-when HTTP_RESPONSE {
-  if {[HTTP::header value "Content-Type"] contains "text/html"} {
-    set payload [HTTP::payload]
-    if {$payload ne ""} {
-      set script "<script src=\"https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js\"></script>"
-      regsub -all "</head>" $payload "${script}</head>" payload
-      HTTP::payload replace 0 [string length [HTTP::payload]] $payload
-    }
-  }
-}
-```
+### Per-app and per-environment mapping
 
-### WAF rule example (ModSecurity-style response edit)
-
-```apache
-SecResponseBodyAccess On
-SecRule RESPONSE_CONTENT_TYPE "@contains text/html" \
-  "id:100001,phase:4,pass,nolog,ctl:ruleEngine=On, \
-  t:none, \
-  setvar:tx.inject_script=|<script src=\\\"https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.min.js\\\"></script>|, \
-  append:'%{tx.inject_script}'"
-```
-
-## Configuration management without app changes
-
-### Per-app/per-env mapping without code access
-
-Maintain a simple mapping in infra config that ties hostnames (and optionally environments) to a specific bootstrap version or build. This lets the platform team control exactly what each app loads without touching app repos.
-
-Recommended approach:
-
-- Treat the mapping as the single source of truth.
-- Use it to generate edge/CDN injection rules per host.
-- Pin versions per app so upgrades are deliberate and reversible.
-- Include per-app tokens so each team has isolated data and access control.
+Maintain a small platform-owned mapping so each host loads a pinned script version and token set.
 
 ```yaml
 rum_onboarded_apps:
@@ -359,49 +181,7 @@ rum_onboarded_apps:
     rumAccessToken: "app2-token"
 ```
 
-Use it to generate injection rules like:
-
-```html
-<script src="https://cdn.internal.company.com/rum-bootstrap/0.2.0-beta/rumBootstrap.min.js"></script>
-```
-
-Common patterns:
-
-- Split by environment with separate hostnames (dev/stg/prod) mapped to different builds.
-- Roll forward by updating the version for one host at a time.
-- Roll back by reverting the version in the mapping (no app deploy needed).
-- If tokens differ per app, either bake them into per-app builds or have the bootstrap fetch a token from a platform-owned config endpoint before init.
-
-Example CI job that generates per-app scripts from the mapping:
-
-```bash
-# pseudo-CI step (bash + jq)
-set -euo pipefail
-
-CONFIG=rum_onboarded_apps.yaml
-OUT_DIR=dist/rum-bootstrap
-VERSION=0.2.0-beta
-
-mkdir -p "$OUT_DIR"
-
-# For each app/env, inject host-specific token into a template and publish.
-yq -o=json ".rum_onboarded_apps[]" "$CONFIG" | jq -c '.' | while read -r app; do
-  host=$(echo "$app" | jq -r '.host')
-  env=$(echo "$app" | jq -r '.env')
-  token=$(echo "$app" | jq -r '.rumAccessToken')
-
-  out="$OUT_DIR/${host}/${env}/${VERSION}/rumBootstrap.min.js"
-  mkdir -p "$(dirname "$out")"
-
-  # Replace placeholders in a template; minify as needed.
-  sed -e "s/__RUM_ACCESS_TOKEN__/${token}/g" \
-      -e "s/__RUM_VERSION__/${VERSION}/g" \
-      -e "s/__RUM_ENV__/${env}/g" \
-      templates/rumBootstrap.template.js > "$out"
-done
-```
-
-Injection layer then maps each host to its generated script URL:
+Use that mapping to drive your injection rules or generated script URLs:
 
 ```html
 <script src="https://cdn.internal.company.com/rum-bootstrap/app1.company.com/prod/0.2.0-beta/rumBootstrap.min.js"></script>
@@ -409,60 +189,20 @@ Injection layer then maps each host to its generated script URL:
 
 ### Environment-specific builds
 
-Build one artifact per environment with baked-in config:
+If you want strict separation by environment, publish one build per environment:
 
-- `rumBootstrap.dev.js` (dev realm + dev token)
-- `rumBootstrap.stg.js` (staging realm + token)
-- `rumBootstrap.prod.js` (prod realm + token)
+- `rumBootstrap.dev.min.js`
+- `rumBootstrap.stg.min.js`
+- `rumBootstrap.prod.min.js`
 
-Publish to CDN:
+Then map each hostname to the correct build in the edge or delivery layer.
 
-- `https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.dev.min.js`
-- `https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.stg.min.js`
-- `https://cdn.internal.company.com/rum-bootstrap/0.1.0-beta/rumBootstrap.prod.min.js`
+### When app-code access is needed
 
-Example mapping:
+You usually do not need app-repo changes for the baseline MPA-style rollout. App-code changes are only needed when a team wants:
 
-- `app1-dev.company.com` → `rumBootstrap.dev.min.js`
-- `app1.company.com` → `rumBootstrap.prod.min.js`
+- React router tracking through the SPA package
+- UI-driven calls such as `window.enableReplayPersist()`
+- Per-component masking or unmasking rules implemented in app markup
 
-### Per-app sensitivity rules without repo access
-
-Option 1: generate different `rumBootstrap.js` per app.
-
-Option 2: build a central config endpoint and fetch overrides at runtime:
-
-```js
-const host = window.location.host;
-
-fetch(`https://config.internal.company.com/rum/recorder-config?host=${encodeURIComponent(host)}`)
-  .then((res) => res.json())
-  .then((cfg) => {
-    Object.assign(SESSION_RECORDER_OPTIONS, cfg);
-    // then init as normal
-  });
-```
-
-## Alternate no-code options
-
-If edge injection is not available but you control another shared entrypoint:
-
-- Tag manager (GTM, Tealium, Adobe Launch): add a tag that injects the script early.
-- Shared layout/theme system: add the script in the shared template.
-- Internal browser extension (internal tools only): inject scripts into specified domains.
-
-## Where you do need code access
-
-You only need repo access if you want:
-
-- SPA router hooks for enabling replay based on internal route state.
-- App code calling `window.enableReplayPersist()` from custom UI.
-- Per-component data attributes that control masking/unmasking.
-
-For the core use case, the combination of:
-
-- Shared versioned `rumBootstrap.js`
-- Central hosting (Artifactory/CDN)
-- Edge/ingress/tag-manager injection
-
-lets a central platform team solve RUM deployments end-to-end without involving app teams.
+That combination of a shared bootstrap, internal hosting, and central injection is enough for most internal deployments.
