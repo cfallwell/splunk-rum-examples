@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.0
+
+- Removed the `godmode` URL override from both bootstrap flows.
+- Vendored the minified Splunk RUM browser SDK and session recorder into `src/vendor`.
+- Embedded the vendored scripts locally so neither bootstrap fetches the SDK from the CDN at runtime.
+
 ## 4.0.0
 
 - Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (`async = false`, `defer = false`).

@@ -7,9 +7,9 @@ TypeScript utilities to bootstrap Splunk RUM + Session Replay for React SPAs.
 Latest release notes live in `CHANGELOG.md`.
 
 <!-- release:auto:start -->
-- Current version: `v4.0.0`
-- Latest update: Changed the generic script loader in both the npm package and the MPA bootstrap script to load Splunk CDN scripts synchronously (async = false, defer = false).
-- Additional updates: 0 (see `CHANGELOG.md`)
+- Current version: `v5.0.0`
+- Latest update: Removed the godmode URL override from both bootstrap flows.
+- Additional updates: 2 (see `CHANGELOG.md`)
 <!-- release:auto:end -->
 
 ## Build
@@ -53,23 +53,18 @@ The library ships with a minimal default config so it can bootstrap without app 
 
 ## URL parameters
 
-Only the following URL params are supported for enabling Session Replay:
+Only the following URL param is supported for enabling Session Replay:
 
 - `replay=on|true`
-- `godmode=on|true` (enables all features and sets `maskAllInputs=false` and `maskAllText=false`)
 
-Legacy params like `canvas` or `assets` are not supported.
+Legacy params like `godmode`, `canvas`, or `assets` are not supported.
 
-## Version pinning
+## Vendored SDK source
 
-This build pins both RUM and Session Recorder to v1.1.0 to avoid version mismatch with `latest`.
+The package vendors the minified Splunk browser SDK files into `spa-npm/src/vendor/` and embeds them locally when the bootstrap initializes. This avoids runtime CDN fetches while keeping the source artifacts in-repo.
 
-Where it is set:
+To refresh the vendored SDK:
 
-- `spa-npm/src/rumBootstrap.ts` (`RUM_VERSION` constant).
-
-How to manage it:
-
-- Update `RUM_VERSION` to the desired Splunk release.
-- Ensure both CDN URLs (RUM + Session Recorder) still reference the same version.
-- Rebuild the package (`npm run build`) and publish a new version.
+- Replace the minified files in `spa-npm/src/vendor/`.
+- Run `node ../scripts/generate-rum-embeds.mjs`.
+- Rebuild the package with `npm run build`.

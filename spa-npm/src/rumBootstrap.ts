@@ -1,3 +1,8 @@
+import {
+  SPLUNK_RUM_SCRIPT_BASE64,
+  SPLUNK_SESSION_REPLAY_SCRIPT_BASE64,
+} from "./vendor/embeddedSources";
+
 // src/rumBootstrap.ts
 export interface RumConfig {
   realm: string;
@@ -35,15 +40,6 @@ export const DEFAULT_RUM_CONFIG: RumConfig = {
   ignoreUrls: ["http://sampleurl.org"],
 };
 
-// Splunk docs CDN URLs
-const RUM_VERSION = "1.1.0";
-
-export const RUM_SCRIPT_URL =
-  `https://cdn.signalfx.com/o11y-gdi-rum/v${RUM_VERSION}/splunk-otel-web.js`;
-
-export const SESSION_REPLAY_SCRIPT_URL =
-  `https://cdn.signalfx.com/o11y-gdi-rum/v${RUM_VERSION}/splunk-otel-web-session-recorder.js`;
-
 // Session-scoped enablement
 const SESSION_STATE_KEY = "splunk-session-replay-enabled";
 const REPLAY_ENABLE_VALUES = new Set(["on", "true"]);
@@ -51,17 +47,24 @@ const REPLAY_ENABLE_VALUES = new Set(["on", "true"]);
 // ----------------------------------------------------
 // HELPERS
 // ----------------------------------------------------
-const loadScript = (src: string): Promise<void> =>
+const decodeBase64 = (value: string): string => window.atob(value);
+
+const loadEmbeddedScript = (id: string, sourceBase64: string): Promise<void> =>
   new Promise((resolve, reject) => {
-    // IMPORTANT: only call this when you truly want to load the script.
+    if (document.querySelector(`script[data-rum-embed="${id}"]`)) {
+      resolve();
+      return;
+    }
+
     const el = document.createElement("script");
     el.async = false;
     el.defer = false;
-    el.src = src;
-    el.crossOrigin = "anonymous";
+    el.dataset.rumEmbed = id;
+    el.text = decodeBase64(sourceBase64);
     el.onload = () => resolve();
     el.onerror = (err) => reject(err);
     document.head.appendChild(el);
+    resolve();
   });
 
 const urlRequestsReplayEnable = (): boolean => {
@@ -93,38 +96,6 @@ const hasValidReplayCredentials = (config: RumConfig): boolean => {
   return true;
 };
 
-const isEnabledParam = (value: string | null): boolean => {
-  if (value == null) return false;
-  const v = value.toLowerCase();
-  return v === "true" || v === "on";
-};
-
-const applyGodmodeParamFromUrl = (config: SessionReplayConfig): void => {
-  try {
-    const params = getUrlParams();
-    const godmode = isEnabledParam(params.get("godmode"));
-    if (!godmode) return;
-
-    const cfg = config as Record<string, unknown>;
-    const currentFeatures = cfg.features;
-    const features =
-      typeof currentFeatures === "object" && currentFeatures !== null
-        ? { ...(currentFeatures as Record<string, unknown>) }
-        : {};
-
-    cfg.maskAllInputs = false;
-    cfg.maskAllText = false;
-    features.canvas = true;
-    features.video = true;
-    features.iframes = true;
-    features.cacheAssets = true;
-    features.packAssets = { styles: true, fonts: true, images: true };
-    cfg.features = features;
-  } catch {
-    // Ignore malformed URL params; fall back to provided config.
-  }
-};
-
 export const isReplayEnabledInSession = (): boolean =>
   typeof sessionStorage !== "undefined" &&
   sessionStorage.getItem(SESSION_STATE_KEY) === "on";
@@ -147,7 +118,7 @@ export const initRUM = async (overrideConfig?: Partial<RumConfig>): Promise<void
   if (rumInitialized) return;
   rumInitialized = true;
 
-  await loadScript(RUM_SCRIPT_URL);
+  await loadEmbeddedScript("splunk-rum", SPLUNK_RUM_SCRIPT_BASE64);
 
   if (!window.SplunkRum?.init) {
     console.warn("[Splunk RUM] init() not found. Check script URL.");
@@ -172,7 +143,7 @@ let replayInitialized = false;
 
 const loadReplayScript = async (): Promise<void> => {
   if (replayScriptLoaded) return;
-  await loadScript(SESSION_REPLAY_SCRIPT_URL);
+  await loadEmbeddedScript("splunk-session-replay", SPLUNK_SESSION_REPLAY_SCRIPT_BASE64);
   replayScriptLoaded = true;
 };
 
@@ -211,9 +182,6 @@ export const initSessionReplay = async (
     // Allow caller overrides (masking, sampling, privacy, etc.):
     ...(replayConfigOverride ?? {}),
   };
-
-  applyGodmodeParamFromUrl(replayConfig);
-
   recorder.init(replayConfig);
   window.SplunkSessionReplayConfig = replayConfig;
   replayInitialized = true;
