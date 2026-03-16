@@ -1,0 +1,69 @@
+pipeline {
+  agent any
+
+  environment {
+    ARTIFACTORY_BASE_URL = 'https://artifactory.company.com/signalfx/rum-scripts/releases'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Setup Node') {
+      steps {
+        sh '''
+          set -eu
+          node --version
+          npm --version
+        '''
+      }
+    }
+
+    stage('Install Dependencies') {
+      steps {
+        sh '''
+          set -eu
+          npm install
+          cd spa-npm
+          npm install
+        '''
+      }
+    }
+
+    stage('Build Release Assets') {
+      steps {
+        sh '''
+          set -eu
+          npm --prefix spa-npm run build
+          node scripts/stage-mpa-signalfx-release.mjs
+        '''
+      }
+    }
+
+    stage('Upload To Artifactory') {
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: 'artifactory-company-creds',
+          usernameVariable: 'ARTIFACTORY_USER',
+          passwordVariable: 'ARTIFACTORY_PASSWORD'
+        )]) {
+          script {
+            def manifest = readJSON file: 'mpa-script/src/signalfx/manifest.json'
+            def release = manifest.release
+            def releaseDir = "dist/signalfx/rum-scripts/releases/${release}"
+            sh """
+              set -eu
+              curl -sfL -u "${ARTIFACTORY_USER}:${ARTIFACTORY_PASSWORD}" -T "${releaseDir}/splunk-otel-web.js" "${ARTIFACTORY_BASE_URL}/${release}/splunk-otel-web.js"
+              curl -sfL -u "${ARTIFACTORY_USER}:${ARTIFACTORY_PASSWORD}" -T "${releaseDir}/splunk-otel-web-session-recorder.js" "${ARTIFACTORY_BASE_URL}/${release}/splunk-otel-web-session-recorder.js"
+              curl -sfL -u "${ARTIFACTORY_USER}:${ARTIFACTORY_PASSWORD}" -T "${releaseDir}/manifest.json" "${ARTIFACTORY_BASE_URL}/${release}/manifest.json"
+              curl -sfL -u "${ARTIFACTORY_USER}:${ARTIFACTORY_PASSWORD}" -T "${releaseDir}/release.json" "${ARTIFACTORY_BASE_URL}/${release}/release.json"
+            """
+          }
+        }
+      }
+    }
+  }
+}

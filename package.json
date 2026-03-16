@@ -2,6 +2,9 @@
   "name": "splunkrum-examples-workspace",
   "private": true,
   "scripts": {
+    "mpa-embed:generate": "node scripts/generate-mpa-embed.mjs",
+    "mpa-embed:update": "node scripts/update-mpa-embed-signalfx-scripts.mjs",
+    "mpa-script:stage-signalfx-release": "node scripts/stage-mpa-signalfx-release.mjs",
     "release:set-version": "node scripts/set-release-version.mjs",
     "signalfx:update": "node scripts/update-signalfx-scripts.mjs",
     "lint": "npm run lint:spa-npm && npm run lint:spa-demo",

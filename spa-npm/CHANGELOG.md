@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Added `mpa-embed` as an app-team example for embedding the SignalFx RUM and session-recorder scripts locally inside a frontend repository.
+- Added dedicated `mpa-embed` generate and update scripts, with version discovery pointed at the internal object-store release path `https://artifactory.company.com/signalfx/rum-scripts/releases/`.
+- Added a platform-side staging script and example Jenkins pipeline that publish the versioned SignalFx script files to the same Artifactory path consumed by `mpa-embed`.
+
 ## 1.0.0
 
 - Reset the release line so GitHub Releases, the npm package, and the MPA bootstrap all publish under the same version.

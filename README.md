@@ -10,6 +10,7 @@ The goal is to let a platform team host, version, and roll out RUM internally wi
 ## What to use
 
 - [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js): standalone browser bootstrap for MPAs and simple SPAs.
+- [`mpa-embed/rumbootstrap.js`](./mpa-embed/rumbootstrap.js): app-team example for embedding the SignalFx scripts locally inside an application repo.
 - [`spa-npm/README.md`](./spa-npm/README.md): React SPA package, build, publish, and package-usage instructions.
 - [`spa-demo/README.md`](./spa-demo/README.md): local demo app showing the SPA package in use.
 
@@ -101,6 +102,8 @@ Package-specific build and publish steps live in [`spa-npm/README.md`](./spa-npm
 - SPA package build, publish, and usage: [`spa-npm/README.md`](./spa-npm/README.md)
 - Demo app setup and local testing: [`spa-demo/README.md`](./spa-demo/README.md)
 - Standalone hosted bootstrap source: [`mpa-script/rumbootstrap.js`](./mpa-script/rumbootstrap.js)
+- App-team local embed example: [`mpa-embed/rumbootstrap.js`](./mpa-embed/rumbootstrap.js)
+- Example Jenkins Artifactory publish job for the shared SignalFx release files: [`jenkins/Jenkinsfile.mpa-signalfx-artifactory`](./jenkins/Jenkinsfile.mpa-signalfx-artifactory)
 
 ## Optional Recorder Settings
 
