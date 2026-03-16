@@ -59,7 +59,7 @@ Only the following URL param is supported for enabling Session Replay:
 
 Legacy params like `godmode`, `canvas`, or `assets` are not supported.
 
-## Vendored SDK source
+## Local SignalFx SDK source
 
 The package stores the minified Splunk browser SDK files in `spa-npm/src/signalfx/` and embeds them locally when the bootstrap initializes. This avoids runtime CDN fetches while keeping the source artifacts in-repo.
 
@@ -71,5 +71,6 @@ The generated embedded script tags include:
 
 To refresh the SignalFx SDK:
 
-- Run `node ../scripts/update-signalfx-scripts.mjs <release>`.
+- Run `node ../scripts/update-signalfx-scripts.mjs` and choose a published release from the numbered list.
+- If you already know the exact release, run `node ../scripts/update-signalfx-scripts.mjs v2.3.0`.
 - Rebuild the package with `npm run build`.
